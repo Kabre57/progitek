@@ -1,0 +1,243 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  libelle     String   @unique @db.VarChar(100)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  utilisateurs Utilisateur[]
+
+  @@map("role")
+}
+
+model Utilisateur {
+  id                        Int       @id @default(autoincrement())
+  nom                       String    @db.VarChar(100)
+  prenom                    String    @db.VarChar(100)
+  email                     String    @unique @db.VarChar(255)
+  motDePasse                String    @map("mot_de_passe") @db.VarChar(255)
+  roleId                    Int?      @map("role_id")
+  resetPasswordToken        String?   @map("reset_password_token") @db.VarChar(255)
+  resetPasswordExpiresAt    DateTime? @map("reset_password_expires_at")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime  @updatedAt @map("updated_at")
+  theme                     String?   @default("light") @db.VarChar(50)
+  displayName               String?   @map("display_name") @db.VarChar(200)
+  dob                       DateTime? @db.Date
+  balance                   Decimal?  @default(0) @db.Decimal(10, 2)
+  phone                     String?   @db.VarChar(20)
+  emailStatus               String?   @default("verified") @map("email_status") @db.VarChar(20)
+  kycStatus                 String?   @default("pending") @map("kyc_status") @db.VarChar(20)
+  lastLogin                 DateTime? @map("last_login")
+  status                    String?   @default("active") @db.VarChar(20)
+  address                   String?
+  state                     String?   @db.VarChar(100)
+  country                   String?   @default("France") @db.VarChar(100)
+  designation               String?   @db.VarChar(100)
+  projects                  Json?
+  performed                 Json?
+  tasks                     Json?
+  authUserId                String?   @map("auth_user_id") @db.Uuid
+
+  // Relations
+  role                      Role?                    @relation(fields: [roleId], references: [id])
+  notifications             Notification[]
+  notificationPreferences   NotificationPreferences?
+  reports                   Report[]
+  auditLogs                 AuditLog[]
+  activityLogs              ActivityLog[]
+  validationRequests        ValidationInstance[]     @relation("ValidationRequester")
+  validationAssignments     ValidationInstance[]     @relation("ValidationAssigned")
+  validationCompletions     ValidationInstance[]     @relation("ValidationCompleted")
+
+  @@map("utilisateur")
+}
+
+model Client {
+  id                   Int       @id @default(autoincrement())
+  nom                  String    @db.VarChar(255)
+  theme                String?   @db.VarChar(50)
+  email                String    @unique @db.VarChar(255)
+  telephone            String?   @db.VarChar(20)
+  entreprise           String?   @db.VarChar(255)
+  typeDeCarte          String?   @map("type_de_carte") @db.VarChar(50)
+  numeroDeCarte        String?   @map("numero_de_carte") @db.VarChar(100)
+  dateInscription      DateTime  @default(now()) @map("date_d_inscription")
+  statut               String?   @default("active") @db.VarChar(20)
+  image                String?   @db.VarChar(500)
+  localisation         String?   @db.VarChar(255)
+
+  // Relations
+  missions Mission[]
+
+  @@map("client")
+}
+
+model Specialite {
+  id          Int      @id @default(autoincrement())
+  libelle     String   @unique @db.VarChar(100)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  techniciens Technicien[]
+
+  @@map("specialite")
+}
+
+model Technicien {
+  id           Int      @id @default(autoincrement())
+  nom          String?  @db.VarChar(100)
+  prenom       String?  @db.VarChar(100)
+  contact      String?  @db.VarChar(20)
+  specialiteId Int?     @map("specialite_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  specialite     Specialite?    @relation(fields: [specialiteId], references: [id])
+  interventions  Intervention[]
+
+  @@map("technicien")
+}
+
+model Mission {
+  numIntervention              Int       @id @default(autoincrement()) @map("num_intervention")
+  natureIntervention           String?   @map("nature_intervention") @db.VarChar(255)
+  objectifDuContrat            String?   @map("objectif_du_contrat")
+  description                  String?
+  dateSortieFicheIntervention  DateTime? @map("date_sortie_fiche_intervention") @db.Date
+  clientId                     Int?      @map("client_id")
+  createdAt                    DateTime  @default(now()) @map("created_at")
+  updatedAt                    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  client        Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  interventions Intervention[]
+
+  @@map("mission")
+}
+
+model Intervention {
+  id              Int       @id @default(autoincrement())
+  dateHeureDebut  DateTime? @map("date_heure_debut")
+  dateHeureFin    DateTime? @map("date_heure_fin")
+  duree           Decimal?  @db.Decimal(5, 2)
+  missionId       Int?      @map("mission_id")
+  technicienId    Int?      @map("technicien_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  mission    Mission?    @relation(fields: [missionId], references: [numIntervention], onDelete: Cascade)
+  technicien Technicien? @relation(fields: [technicienId], references: [id])
+
+  @@map("intervention")
+}
+
+model Notification {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  type      String    @db.VarChar(50)
+  message   String
+  data      Json?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user Utilisateur @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model NotificationPreferences {
+  id                     Int      @id @default(autoincrement())
+  userId                 Int      @unique @map("user_id")
+  checkUnusualActivity   Boolean  @default(true) @map("check_unusual_activity")
+  checkNewSignIn         Boolean  @default(false) @map("check_new_sign_in")
+  notifyLatestNews       Boolean  @default(true) @map("notify_latest_news")
+  notifyFeatureUpdate    Boolean  @default(false) @map("notify_feature_update")
+  notifyAccountTips      Boolean  @default(true) @map("notify_account_tips")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user Utilisateur @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  reportType String   @map("report_type") @db.VarChar(50)
+  createdAt  DateTime @default(now()) @map("created_at")
+  userId     Int?     @map("user_id")
+
+  // Relations
+  user Utilisateur? @relation(fields: [userId], references: [id])
+
+  @@map("reports")
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  username   String?  @db.VarChar(255)
+  actionType String   @map("action_type") @db.VarChar(50)
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   Int?     @map("entity_id")
+  details    String?
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  timestamp  DateTime @default(now())
+
+  // Relations
+  user Utilisateur? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  ip        String?  @db.VarChar(45)
+  browser   String?
+  loginTime DateTime @default(now()) @map("login_time")
+
+  // Relations
+  user Utilisateur @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activity_log")
+}
+
+model ValidationInstance {
+  id                   Int       @id @default(autoincrement())
+  entityType           String    @map("entity_type") @db.VarChar(50)
+  entityId             Int       @map("entity_id")
+  status               String    @default("pending") @db.VarChar(20)
+  requestedByUserId    Int?      @map("requested_by_user_id")
+  assignedValidatorId  Int?      @map("assigned_validator_id")
+  validatedByUserId    Int?      @map("validated_by_user_id")
+  comments             String?
+  submittedAt          DateTime  @default(now()) @map("submitted_at")
+  validatedAt          DateTime? @map("validated_at")
+
+  // Relations
+  requestedBy    Utilisateur? @relation("ValidationRequester", fields: [requestedByUserId], references: [id])
+  assignedTo     Utilisateur? @relation("ValidationAssigned", fields: [assignedValidatorId], references: [id])
+  validatedBy    Utilisateur? @relation("ValidationCompleted", fields: [validatedByUserId], references: [id])
+
+  @@map("validation_instances")
+}
