@@ -41,7 +41,7 @@ export const SettingsPage: React.FC = () => {
   const tabs = [
     { id: 'profile', label: 'Profil', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Sécurité', icon: Shield },
+    { id: 'security', label: 'développeur web', icon: Shield },
     { id: 'appearance', label: 'Apparence', icon: Palette },
     { id: 'system', label: 'Système', icon: Globe }
   ];
@@ -165,14 +165,14 @@ export const SettingsPage: React.FC = () => {
                   {key === 'pushNotifications' && 'Notifications push'}
                   {key === 'smsNotifications' && 'Notifications SMS'}
                   {key === 'weeklyReport' && 'Rapport hebdomadaire'}
-                  {key === 'securityAlerts' && 'Alertes de sécurité'}
+                  {key === 'securityAlerts' && 'Alertes de développeur web'}
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {key === 'emailNotifications' && 'Recevoir les notifications par email'}
                   {key === 'pushNotifications' && 'Recevoir les notifications push dans le navigateur'}
                   {key === 'smsNotifications' && 'Recevoir les notifications par SMS'}
                   {key === 'weeklyReport' && 'Recevoir un rapport hebdomadaire d\'activité'}
-                  {key === 'securityAlerts' && 'Recevoir les alertes de sécurité importantes'}
+                  {key === 'securityAlerts' && 'Recevoir les alertes de développeur web importantes'}
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -264,7 +264,8 @@ export const SettingsPage: React.FC = () => {
               onChange={(e) => setSystemSettings({ ...systemSettings, timezone: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="Europe/Paris">Europe/Paris</option>
+              <option value="Abidjan/côte d'ivoire">Abidjan/côte d'ivoire</option>
+              <option value="Abidjan/Paris">Europe/Paris</option>
               <option value="Europe/London">Europe/London</option>
               <option value="America/New_York">America/New_York</option>
             </select>
@@ -292,9 +293,12 @@ export const SettingsPage: React.FC = () => {
               onChange={(e) => setSystemSettings({ ...systemSettings, currency: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="EUR">Euro (€)</option>
+              <option value="XOF">F CFA (XOF)</option>
               <option value="USD">Dollar US ($)</option>
               <option value="GBP">Livre Sterling (£)</option>
+              <option value="E">Euro (€)</option>
+              <option value="CNY">Yuan Renminbi (CNY)</option>
+              <option value="JPY">Yen Japonais (JPY)</option>
             </select>
           </div>
         </div>

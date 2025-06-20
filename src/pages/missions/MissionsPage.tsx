@@ -40,10 +40,10 @@ export const MissionsPage: React.FC = () => {
           date_sortie_fiche_intervention: '2024-01-15',
           client: {
             id: 1,
-            nom: 'TechCorp Solutions',
+            nom: 'INFAS',
             email: 'contact@techcorp.com',
-            telephone: '+33 1 23 45 67 89',
-            entreprise: 'TechCorp Solutions',
+            telephone: '+225 07 07 07 07',
+            entreprise: 'INFAS',
             date_d_inscription: '2024-01-01T00:00:00Z'
           }
         },
@@ -64,9 +64,9 @@ export const MissionsPage: React.FC = () => {
         },
         {
           num_intervention: 1003,
-          nature_intervention: 'Audit sécurité',
-          objectif_du_contrat: 'Audit complet de la sécurité informatique',
-          description: 'Évaluation complète de la sécurité du système d\'information, test de pénétration et recommandations d\'amélioration.',
+          nature_intervention: 'Audit développeur web',
+          objectif_du_contrat: 'Audit complet de la développeur web informatique',
+          description: 'Évaluation complète de la développeur web du système d\'information, test de pénétration et recommandations d\'amélioration.',
           date_sortie_fiche_intervention: '2024-01-20',
           client: {
             id: 3,
@@ -92,9 +92,9 @@ export const MissionsPage: React.FC = () => {
       const mockClients: Client[] = [
         {
           id: 1,
-          nom: 'TechCorp Solutions',
+          nom: 'INFAS',
           email: 'contact@techcorp.com',
-          entreprise: 'TechCorp Solutions',
+          entreprise: 'INFAS',
           date_d_inscription: '2024-01-01T00:00:00Z'
         },
         {

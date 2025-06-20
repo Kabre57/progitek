@@ -32,31 +32,31 @@ export const TechniciansPage: React.FC = () => {
       const mockTechnicians: Technicien[] = [
         {
           id: 1,
-          nom: 'Martin',
-          prenom: 'Jean',
-          contact: '+33 6 12 34 56 78',
+          nom: 'Yane',
+          prenom: 'Konan',
+          contact: '+225 06 12 34 56 78',
           specialite: { id: 1, libelle: 'Réseau' }
         },
         {
           id: 2,
-          nom: 'Dubois',
-          prenom: 'Marie',
-          contact: '+33 6 98 76 54 32',
-          specialite: { id: 2, libelle: 'Sécurité' }
+          nom: 'Kabres',
+          prenom: 'Theodore',
+          contact: '+225 07 57 39 01 57',
+          specialite: { id: 2, libelle: 'développeur web' }
         },
         {
           id: 3,
-          nom: 'Leroy',
-          prenom: 'Pierre',
-          contact: '+33 6 11 22 33 44',
+          nom: 'BEIBRO',
+          prenom: 'KOUASSI',
+          contact: '+225 07 09 60 23 18 60',
           specialite: { id: 3, libelle: 'Hardware' }
         },
         {
           id: 4,
-          nom: 'Bernard',
-          prenom: 'Sophie',
-          contact: '+33 6 55 66 77 88',
-          specialite: { id: 4, libelle: 'Cloud' }
+          nom: 'EVRARD',
+          prenom: 'ANGUI',
+          contact: '+225 07 68 59 33 71',
+          specialite: { id: 4, libelle: 'DevOps' }
         }
       ];
       setTechnicians(mockTechnicians);
@@ -72,9 +72,9 @@ export const TechniciansPage: React.FC = () => {
     try {
       const mockSpecialites: Specialite[] = [
         { id: 1, libelle: 'Réseau' },
-        { id: 2, libelle: 'Sécurité' },
+        { id: 2, libelle: 'développeur web' },
         { id: 3, libelle: 'Hardware' },
-        { id: 4, libelle: 'Cloud' },
+        { id: 4, libelle: 'DevOps' },
         { id: 5, libelle: 'Software' }
       ];
       setSpecialites(mockSpecialites);
@@ -146,9 +146,9 @@ export const TechniciansPage: React.FC = () => {
   const getSpecialiteColor = (specialite: string) => {
     const colors = {
       'Réseau': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-      'Sécurité': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+      'développeur web': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
       'Hardware': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-      'Cloud': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+      'DevOps': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
       'Software': 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300'
     };
     return colors[specialite as keyof typeof colors] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';

@@ -32,7 +32,7 @@ export const ForgotPasswordPage: React.FC = () => {
       setEmailSent(true);
       toast.success('Email de réinitialisation envoyé !');
     } catch (error: any) {
-      // Ne pas révéler si l'email existe ou non pour des raisons de sécurité
+      // Ne pas révéler si l'email existe ou non pour des raisons de développeur web
       // Simuler un succès même en cas d'erreur
       setEmailSent(true);
       toast.success('Si cet email existe, un lien de réinitialisation a été envoyé');

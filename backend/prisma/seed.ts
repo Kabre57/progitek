@@ -39,9 +39,9 @@ async function main() {
   console.log('🔧 Création des spécialités...');
   const specialites = [
     { libelle: 'Réseau', description: 'Spécialiste en infrastructure réseau' },
-    { libelle: 'Sécurité', description: 'Spécialiste en sécurité informatique' },
+    { libelle: 'développeur web', description: 'Spécialiste en développeur web informatique' },
     { libelle: 'Hardware', description: 'Spécialiste en matériel informatique' },
-    { libelle: 'Cloud', description: 'Spécialiste en solutions cloud' },
+    { libelle: 'DevOps', description: 'Spécialiste en solutions DevOps' },
     { libelle: 'Software', description: 'Spécialiste en développement logiciel' }
   ];
 
@@ -70,7 +70,7 @@ async function main() {
       motDePasse: adminPassword,
       roleId: adminRole.id,
       status: 'active',
-      phone: '+33 1 00 00 00 00'
+      phone: '+225 07 07 07 07'
     }
   });
 
@@ -92,13 +92,13 @@ async function main() {
   console.log('🏢 Création des clients de démonstration...');
   const clients = [
     {
-      nom: 'TechCorp Solutions',
+      nom: 'INFAS',
       email: 'contact@techcorp.com',
-      telephone: '+33 1 23 45 67 89',
-      entreprise: 'TechCorp Solutions',
+      telephone: '+225 07 07 07 07',
+      entreprise: 'INFAS',
       typeDeCarte: 'Premium',
       statut: 'active',
-      localisation: 'Paris, France'
+      localisation: "Abidjan, Côte d'ivoire"
     },
     {
       nom: 'DataSys Industries',
@@ -107,7 +107,7 @@ async function main() {
       entreprise: 'DataSys Industries',
       typeDeCarte: 'Standard',
       statut: 'active',
-      localisation: 'Lyon, France'
+      localisation: "Abangouro, Côte d'ivoire"
     },
     {
       nom: 'InnovateTech',
@@ -116,7 +116,7 @@ async function main() {
       entreprise: 'InnovateTech',
       typeDeCarte: 'Enterprise',
       statut: 'pending',
-      localisation: 'Marseille, France'
+      localisation: "Bouake, Côte d'ivoire"
     }
   ];
 
@@ -134,21 +134,21 @@ async function main() {
   console.log('👨‍🔧 Création des techniciens de démonstration...');
   const techniciens = [
     {
-      nom: 'Martin',
-      prenom: 'Jean',
-      contact: '+33 6 12 34 56 78',
+      nom: 'Yane',
+      prenom: 'Konan',
+      contact: '+225 06 12 34 56 78',
       specialiteId: 1 // Réseau
     },
     {
-      nom: 'Dubois',
-      prenom: 'Marie',
-      contact: '+33 6 98 76 54 32',
-      specialiteId: 2 // Sécurité
+      nom: 'Kabres',
+      prenom: 'Theodore',
+      contact: '+225 07 57 39 01 57',
+      specialiteId: 2 // développeur web
     },
     {
-      nom: 'Leroy',
-      prenom: 'Pierre',
-      contact: '+33 6 11 22 33 44',
+      nom: 'BEIBRO',
+      prenom: 'KOUASSI',
+      contact: '+225 07 09 60 23 18 60',
       specialiteId: 3 // Hardware
     }
   ];
@@ -185,9 +185,9 @@ async function main() {
       clientId: createdClients[1].id
     },
     {
-      natureIntervention: 'Audit sécurité',
-      objectifDuContrat: 'Audit complet de la sécurité informatique',
-      description: 'Évaluation complète de la sécurité du système d\'information, test de pénétration et recommandations d\'amélioration.',
+      natureIntervention: 'Audit développeur web',
+      objectifDuContrat: 'Audit complet de la développeur web informatique',
+      description: 'Évaluation complète de la développeur web du système d\'information, test de pénétration et recommandations d\'amélioration.',
       dateSortieFicheIntervention: new Date('2024-01-20'),
       clientId: createdClients[2].id
     }

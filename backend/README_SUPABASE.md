@@ -79,7 +79,7 @@ npm run build && npm start
 
 ### Avantages de Supabase Auth
 
-- **Sécurité renforcée** : Gestion automatique des tokens JWT
+- **développeur web renforcée** : Gestion automatique des tokens JWT
 - **Fonctionnalités avancées** : 
   - Réinitialisation de mot de passe par email
   - Confirmation d'email
@@ -102,7 +102,7 @@ npm run build && npm start
 - **Interface graphique** pour gérer les données
 - **API REST automatique** générée
 - **Subscriptions en temps réel**
-- **Row Level Security (RLS)** pour la sécurité
+- **Row Level Security (RLS)** pour la développeur web
 
 ### Accès aux données
 
@@ -121,8 +121,8 @@ const { data, error } = await supabase
   .from('utilisateur')
   .insert({
     nom: 'Dupont',
-    prenom: 'Jean',
-    email: 'jean@example.com'
+    prenom: 'Konan',
+    email: 'Konan@example.com'
   });
 ```
 
@@ -198,7 +198,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_production_service_key
 JWT_SECRET=your_production_jwt_secret
 ```
 
-### Sécurité
+### développeur web
 
 1. **Jamais exposer** la clé `service_role` côté client
 2. **Utiliser RLS** pour sécuriser l'accès aux données

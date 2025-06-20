@@ -40,7 +40,7 @@ export const SecurityPage: React.FC = () => {
       date: new Date(2024, 5, 15, 10, 30), 
       ip: '192.168.1.1', 
       device: 'Chrome sur Windows', 
-      location: 'Paris, France',
+      location: "Abidjan, Côte d'ivoire",
       status: 'success'
     },
     { 
@@ -48,7 +48,7 @@ export const SecurityPage: React.FC = () => {
       date: new Date(2024, 5, 14, 15, 45), 
       ip: '192.168.1.1', 
       device: 'Firefox sur Windows', 
-      location: 'Paris, France',
+      location: "Abidjan, Côte d'ivoire",
       status: 'success'
     },
     { 
@@ -56,7 +56,7 @@ export const SecurityPage: React.FC = () => {
       date: new Date(2024, 5, 12, 8, 15), 
       ip: '85.214.132.117', 
       device: 'Safari sur iPhone', 
-      location: 'Lyon, France',
+      location: "Abangouro, Côte d'ivoire",
       status: 'success'
     },
     { 
@@ -64,7 +64,7 @@ export const SecurityPage: React.FC = () => {
       date: new Date(2024, 5, 10, 22, 30), 
       ip: '203.0.113.42', 
       device: 'Chrome sur Android', 
-      location: 'Marseille, France',
+      location: "Bouake, Côte d'ivoire",
       status: 'failed'
     }
   ];
@@ -211,10 +211,10 @@ export const SecurityPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Paramètres de sécurité
+            Paramètres de développeur web
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Gérez les paramètres de sécurité de votre compte
+            Gérez les paramètres de développeur web de votre compte
           </p>
         </div>
         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
@@ -371,8 +371,8 @@ export const SecurityPage: React.FC = () => {
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {twoFactorEnabled 
-                ? 'Votre compte est protégé par une couche de sécurité supplémentaire' 
-                : 'Activez cette option pour renforcer la sécurité de votre compte'}
+                ? 'Votre compte est protégé par une couche de développeur web supplémentaire' 
+                : 'Activez cette option pour renforcer la développeur web de votre compte'}
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -455,7 +455,7 @@ export const SecurityPage: React.FC = () => {
                   Authentification à deux facteurs activée
                 </p>
                 <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                  Votre compte est maintenant protégé par une couche de sécurité supplémentaire.
+                  Votre compte est maintenant protégé par une couche de développeur web supplémentaire.
                 </p>
               </div>
             </div>
@@ -510,7 +510,7 @@ export const SecurityPage: React.FC = () => {
                     Cet appareil
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Chrome sur Windows • Paris, France
+                    Chrome sur Windows • Abidjan, Côte d'ivoire
                   </p>
                 </div>
               </div>
@@ -528,7 +528,7 @@ export const SecurityPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    iPhone de Jean
+                    iPhone de Konan
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Safari sur iOS • Lyon, France
@@ -604,11 +604,11 @@ export const SecurityPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Alertes de sécurité */}
+      {/* Alertes de développeur web */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
           <AlertTriangle className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-          Alertes de sécurité
+          Alertes de développeur web
         </h3>
         
         <div className="space-y-4">
@@ -634,10 +634,10 @@ export const SecurityPage: React.FC = () => {
               <CheckCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Aucune autre alerte de sécurité
+                  Aucune autre alerte de développeur web
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Votre compte ne présente pas d'autres alertes de sécurité pour le moment.
+                  Votre compte ne présente pas d'autres alertes de développeur web pour le moment.
                 </p>
               </div>
             </div>

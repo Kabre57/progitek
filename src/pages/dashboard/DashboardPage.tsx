@@ -172,7 +172,7 @@ export const DashboardPage: React.FC = () => {
               {
                 icon: Users,
                 title: 'Nouveau technicien',
-                description: 'Marie Dubois - Spécialité Réseau',
+                description: 'Theodore Kabres - Spécialité Réseau',
                 time: 'Il y a 6h',
                 color: 'text-purple-500'
               },

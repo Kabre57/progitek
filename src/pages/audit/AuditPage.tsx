@@ -36,29 +36,29 @@ export const AuditPage: React.FC = () => {
         {
           id: 1,
           user_id: 1,
-          username: 'jean.martin@progitek.com',
+          username: 'Konan.Yane@progitek.com',
           action_type: 'CREATE',
           entity_type: 'User',
           entity_id: 5,
-          details: 'Création d\'un nouvel utilisateur: Marie Dubois',
+          details: 'Création d\'un nouvel utilisateur: Theodore Kabres',
           ip_address: '192.168.1.100',
           timestamp: '2024-01-15T10:30:00Z'
         },
         {
           id: 2,
           user_id: 2,
-          username: 'marie.dubois@progitek.com',
+          username: 'Theodore.Kabres@progitek.com',
           action_type: 'UPDATE',
           entity_type: 'Client',
           entity_id: 3,
-          details: 'Modification des informations client: TechCorp Solutions',
+          details: 'Modification des informations client: INFAS',
           ip_address: '192.168.1.101',
           timestamp: '2024-01-15T11:45:00Z'
         },
         {
           id: 3,
           user_id: 1,
-          username: 'jean.martin@progitek.com',
+          username: 'Konan.Yane@progitek.com',
           action_type: 'DELETE',
           entity_type: 'Mission',
           entity_id: 1005,
@@ -69,7 +69,7 @@ export const AuditPage: React.FC = () => {
         {
           id: 4,
           user_id: 3,
-          username: 'pierre.leroy@progitek.com',
+          username: 'KOUASSI.BEIBRO@progitek.com',
           action_type: 'LOGIN',
           entity_type: 'Auth',
           entity_id: 3,
@@ -80,7 +80,7 @@ export const AuditPage: React.FC = () => {
         {
           id: 5,
           user_id: 2,
-          username: 'marie.dubois@progitek.com',
+          username: 'Theodore.Kabres@progitek.com',
           action_type: 'CREATE',
           entity_type: 'Intervention',
           entity_id: 25,
@@ -335,7 +335,7 @@ export const AuditPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Alertes de sécurité */}
+      {/* Alertes de développeur web */}
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
         <div className="flex items-start space-x-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />

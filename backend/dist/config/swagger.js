@@ -81,12 +81,12 @@ exports.swaggerOptions = {
                         },
                         prenom: {
                             type: 'string',
-                            example: 'Jean'
+                            example: 'Konan'
                         },
                         email: {
                             type: 'string',
                             format: 'email',
-                            example: 'jean.dupont@progitek.com'
+                            example: 'Konan.dupont@progitek.com'
                         },
                         role_id: {
                             type: 'integer',
@@ -111,7 +111,7 @@ exports.swaggerOptions = {
                         },
                         nom: {
                             type: 'string',
-                            example: 'TechCorp Solutions'
+                            example: 'INFAS'
                         },
                         email: {
                             type: 'string',
@@ -120,11 +120,11 @@ exports.swaggerOptions = {
                         },
                         telephone: {
                             type: 'string',
-                            example: '+33 1 23 45 67 89'
+                            example: '+225 07 07 07 07'
                         },
                         entreprise: {
                             type: 'string',
-                            example: 'TechCorp Solutions'
+                            example: 'INFAS'
                         },
                         type_de_carte: {
                             type: 'string',
@@ -140,7 +140,7 @@ exports.swaggerOptions = {
                         },
                         localisation: {
                             type: 'string',
-                            example: 'Paris, France'
+                            example: "Abidjan, Côte d'ivoire"
                         }
                     }
                 }

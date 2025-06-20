@@ -30,9 +30,9 @@ export const ReportsPage: React.FC = () => {
 
       const mockPieData = [
         { name: 'Réseau', value: 35, color: '#3B82F6' },
-        { name: 'Sécurité', value: 25, color: '#EF4444' },
+        { name: 'développeur web', value: 25, color: '#EF4444' },
         { name: 'Hardware', value: 20, color: '#10B981' },
-        { name: 'Cloud', value: 15, color: '#8B5CF6' },
+        { name: 'DevOps', value: 15, color: '#8B5CF6' },
         { name: 'Software', value: 5, color: '#F59E0B' }
       ];
 

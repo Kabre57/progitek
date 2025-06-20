@@ -231,7 +231,7 @@ export const RegisterPage: React.FC = () => {
                         className={`block w-full pl-10 pr-3 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                           errors.prenom ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                         }`}
-                        placeholder="Jean"
+                        placeholder="Konan"
                       />
                     </div>
                     {errors.prenom && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.prenom}</p>}
@@ -269,7 +269,7 @@ export const RegisterPage: React.FC = () => {
                       className={`block w-full pl-10 pr-3 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.email ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                       }`}
-                      placeholder="jean.dupont@email.com"
+                      placeholder="Konan.dupont@email.com"
                     />
                   </div>
                   {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
@@ -290,7 +290,7 @@ export const RegisterPage: React.FC = () => {
                       className={`block w-full pl-10 pr-3 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.phone ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                       }`}
-                      placeholder="+33 6 12 34 56 78"
+                      placeholder="+225 06 12 34 56 78"
                     />
                   </div>
                   {errors.phone && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>}

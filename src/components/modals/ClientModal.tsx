@@ -102,7 +102,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({
               value={formData.nom}
               onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="TechCorp Solutions"
+              placeholder="INFAS"
             />
           </div>
 
@@ -116,7 +116,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({
               value={formData.entreprise}
               onChange={(e) => setFormData({ ...formData, entreprise: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="TechCorp Solutions"
+              placeholder="INFAS"
             />
           </div>
 
@@ -145,7 +145,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({
               value={formData.telephone}
               onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="+33 1 23 45 67 89"
+              placeholder="+225 07 07 07 07"
             />
           </div>
 
@@ -174,7 +174,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({
               value={formData.localisation}
               onChange={(e) => setFormData({ ...formData, localisation: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Paris, France"
+              placeholder="Abidjan, Côte d'ivoire"
             />
           </div>
 

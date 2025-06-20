@@ -62,7 +62,7 @@ export const authService = {
           email: 'admin@progitek.com',
           role: { id: 1, libelle: 'Administrator' },
           status: 'active',
-          phone: '+33 1 00 00 00 00',
+          phone: '+225 07 07 07 07',
           last_login: new Date().toISOString(),
           created_at: '2024-01-01T00:00:00Z',
           updated_at: new Date().toISOString()
@@ -116,7 +116,7 @@ export const authService = {
             email: 'admin@progitek.com',
             role: { id: 1, libelle: 'Administrator' },
             status: 'active',
-            phone: '+33 1 00 00 00 00',
+            phone: '+225 07 07 07 07',
             last_login: new Date().toISOString(),
             created_at: '2024-01-01T00:00:00Z',
             updated_at: new Date().toISOString()

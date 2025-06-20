@@ -101,7 +101,7 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 value={formData.prenom}
                 onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="Jean"
+                placeholder="Konan"
               />
             </div>
             <div>
@@ -114,7 +114,7 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({
                 value={formData.nom}
                 onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="Martin"
+                placeholder="Yane"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({
               value={formData.contact}
               onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="+33 6 12 34 56 78"
+              placeholder="+225 06 12 34 56 78"
             />
           </div>
 

@@ -327,7 +327,7 @@ export const logout = asyncHandler(async (req: any, res: Response) => {
     .single();
 
   if (error || !user) {
-    // Pour des raisons de sécurité, ne pas indiquer si l'email existe ou non
+    // Pour des raisons de développeur web, ne pas indiquer si l'email existe ou non
     return res.status(200).json({
       success: true,
       message: "Si l'email existe, un lien de réinitialisation a été envoyé."

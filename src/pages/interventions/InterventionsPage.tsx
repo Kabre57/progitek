@@ -67,17 +67,17 @@ export const InterventionsPage: React.FC = () => {
             objectif_du_contrat: 'Maintenance préventive du réseau informatique',
             client: {
               id: 1,
-              nom: 'TechCorp Solutions',
+              nom: 'INFAS',
               email: 'contact@techcorp.com',
-              entreprise: 'TechCorp Solutions',
+              entreprise: 'INFAS',
               date_d_inscription: '2024-01-01T00:00:00Z'
             }
           },
           technicien: {
             id: 1,
-            nom: 'Martin',
-            prenom: 'Jean',
-            contact: '+33 6 12 34 56 78',
+            nom: 'Yane',
+            prenom: 'Konan',
+            contact: '+225 06 12 34 56 78',
             specialite: { id: 1, libelle: 'Réseau' }
           }
         },
@@ -100,10 +100,10 @@ export const InterventionsPage: React.FC = () => {
           },
           technicien: {
             id: 2,
-            nom: 'Dubois',
-            prenom: 'Marie',
-            contact: '+33 6 98 76 54 32',
-            specialite: { id: 2, libelle: 'Sécurité' }
+            nom: 'Kabres',
+            prenom: 'Theodore',
+            contact: '+225 07 57 39 01 57',
+            specialite: { id: 2, libelle: 'développeur web' }
           }
         },
         {
@@ -113,8 +113,8 @@ export const InterventionsPage: React.FC = () => {
           duree: null,
           mission: {
             num_intervention: 1003,
-            nature_intervention: 'Audit sécurité',
-            objectif_du_contrat: 'Audit complet de la sécurité informatique',
+            nature_intervention: 'Audit développeur web',
+            objectif_du_contrat: 'Audit complet de la développeur web informatique',
             client: {
               id: 3,
               nom: 'InnovateTech',
@@ -125,9 +125,9 @@ export const InterventionsPage: React.FC = () => {
           },
           technicien: {
             id: 3,
-            nom: 'Leroy',
-            prenom: 'Pierre',
-            contact: '+33 6 11 22 33 44',
+            nom: 'BEIBRO',
+            prenom: 'KOUASSI',
+            contact: '+225 07 09 60 23 18 60',
             specialite: { id: 3, libelle: 'Hardware' }
           }
         }
@@ -149,9 +149,9 @@ export const InterventionsPage: React.FC = () => {
           nature_intervention: 'Maintenance réseau',
           client: {
             id: 1,
-            nom: 'TechCorp Solutions',
+            nom: 'INFAS',
             email: 'contact@techcorp.com',
-            entreprise: 'TechCorp Solutions',
+            entreprise: 'INFAS',
             date_d_inscription: '2024-01-01T00:00:00Z'
           }
         },
@@ -178,17 +178,17 @@ export const InterventionsPage: React.FC = () => {
       const mockTechnicians: Technicien[] = [
         {
           id: 1,
-          nom: 'Martin',
-          prenom: 'Jean',
-          contact: '+33 6 12 34 56 78',
+          nom: 'Yane',
+          prenom: 'Konan',
+          contact: '+225 06 12 34 56 78',
           specialite: { id: 1, libelle: 'Réseau' }
         },
         {
           id: 2,
-          nom: 'Dubois',
-          prenom: 'Marie',
-          contact: '+33 6 98 76 54 32',
-          specialite: { id: 2, libelle: 'Sécurité' }
+          nom: 'Kabres',
+          prenom: 'Theodore',
+          contact: '+225 07 57 39 01 57',
+          specialite: { id: 2, libelle: 'développeur web' }
         }
       ];
       setTechnicians(mockTechnicians);

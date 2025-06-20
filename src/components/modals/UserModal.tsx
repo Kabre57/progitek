@@ -115,7 +115,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                 value={formData.prenom}
                 onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Jean"
+                placeholder="Konan"
               />
             </div>
             <div>
@@ -144,7 +144,7 @@ export const UserModal: React.FC<UserModalProps> = ({
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="jean.dupont@progitek.com"
+              placeholder="Konan.dupont@progitek.com"
             />
           </div>
 
@@ -192,7 +192,7 @@ export const UserModal: React.FC<UserModalProps> = ({
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="+33 6 12 34 56 78"
+              placeholder="+225 06 12 34 56 78"
             />
           </div>
 

@@ -5,7 +5,7 @@ Backend API pour le système de gestion des interventions techniques ProgiTek.
 ## 🚀 Technologies
 
 - **Node.js** avec **Express.js**
-- **TypeScript** pour la sécurité des types
+- **TypeScript** pour la développeur web des types
 - **PostgreSQL** comme base de données
 - **JWT** pour l'authentification
 - **Zod** pour la validation des données
@@ -113,14 +113,14 @@ Une fois le serveur démarré, la documentation Swagger est disponible à :
 - **Développement** : http://localhost:3000/api-docs
 - **Production** : https://your-domain.com/api-docs
 
-## 🛡️ Sécurité
+## 🛡️ développeur web
 
 - **Authentification JWT** avec tokens sécurisés
 - **Hashage des mots de passe** avec bcrypt
 - **Validation des données** avec Zod
 - **Rate limiting** pour prévenir les attaques
 - **CORS** configuré
-- **Helmet** pour les en-têtes de sécurité
+- **Helmet** pour les en-têtes de développeur web
 - **Audit logging** pour traçabilité
 
 ## 🔗 Endpoints principaux
