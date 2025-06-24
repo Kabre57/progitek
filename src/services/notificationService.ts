@@ -1,49 +1,60 @@
-import { api } from './api';
-import { Notification, NotificationPreferences } from '../types';
+import { apiClient } from './api';
+import { Notification } from '../types/api';
 
-export const notificationService = {
-  async getNotifications(page = 1, limit = 20, unreadOnly = false): Promise<{ notifications: Notification[]; total: number }> {
-    const response = await api.get('/notifications', {
-      params: { page, limit, unread: unreadOnly }
-    });
-    return response.data;
-  },
+export interface SendNotificationData {
+  userId: number;
+  type: string;
+  message: string;
+  data?: any;
+}
 
-  async markAsRead(notificationId: number): Promise<void> {
-    await api.patch(`/notifications/${notificationId}/read`);
-  },
+export interface UpdateNotificationPreferencesData {
+  checkUnusualActivity?: boolean;
+  checkNewSignIn?: boolean;
+  notifyLatestNews?: boolean;
+  notifyFeatureUpdate?: boolean;
+  notifyAccountTips?: boolean;
+}
 
-  async markAllAsRead(): Promise<void> {
-    await api.patch('/notifications/mark-all-read');
-  },
-
-  async deleteNotification(notificationId: number): Promise<void> {
-    await api.delete(`/notifications/${notificationId}`);
-  },
-
-  async getPreferences(): Promise<NotificationPreferences> {
-    const response = await api.get('/notifications/preferences');
-    return response.data;
-  },
-
-  async updatePreferences(preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
-    const response = await api.put('/notifications/preferences', preferences);
-    return response.data;
-  },
-
-  async sendNotification(notification: {
-    user_id: number;
-    type: string;
-    message: string;
-    data?: any;
-    send_email?: boolean;
-  }): Promise<Notification> {
-    const response = await api.post('/notifications/send', notification);
-    return response.data;
-  },
-
-  async getUnreadCount(): Promise<number> {
-    const response = await api.get('/notifications/unread-count');
-    return response.data.count;
+class NotificationService {
+  // Récupérer les notifications de l'utilisateur
+  async getNotifications(): Promise<Notification[]> {
+    const response = await apiClient.get('/notifications');
+    return response.data.data;
   }
-};
+
+  // Marquer une notification comme lue
+  async markAsRead(id: number): Promise<void> {
+    await apiClient.patch(`/notifications/${id}/read`);
+  }
+
+  // Marquer toutes les notifications comme lues
+  async markAllAsRead(): Promise<void> {
+    await apiClient.patch('/notifications/mark-all-read');
+  }
+
+  // Supprimer une notification
+  async deleteNotification(id: number): Promise<void> {
+    await apiClient.delete(`/notifications/${id}`);
+  }
+
+  // Récupérer les préférences de notification
+  async getPreferences(): Promise<any> {
+    const response = await apiClient.get('/notifications/preferences');
+    return response.data.data;
+  }
+
+  // Mettre à jour les préférences de notification
+  async updatePreferences(preferences: UpdateNotificationPreferencesData): Promise<any> {
+    const response = await apiClient.put('/notifications/preferences', preferences);
+    return response.data.data;
+  }
+
+  // Envoyer une notification (admin seulement)
+  async sendNotification(data: SendNotificationData): Promise<Notification> {
+    const response = await apiClient.post('/notifications/send', data);
+    return response.data.data;
+  }
+}
+
+export const notificationService = new NotificationService();

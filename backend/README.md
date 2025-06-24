@@ -1,229 +1,249 @@
-# ProgiTek Backend API
+# 🚀 ParabellumGroups System API - Backend
 
-Backend API pour le système de gestion des interventions techniques ProgiTek.
+API RESTful complète pour la gestion technique avec TypeScript, Express et Prisma.
 
-## 🚀 Technologies
+## 📋 Prérequis
 
-- **Node.js** avec **Express.js**
-- **TypeScript** pour la développeur web des types
-- **PostgreSQL** comme base de données
-- **JWT** pour l'authentification
-- **Zod** pour la validation des données
-- **Swagger** pour la documentation API
-- **Nodemailer** pour l'envoi d'emails
-- **bcryptjs** pour le hashage des mots de passe
+Avant de commencer, assurez-vous d'avoir installé :
 
-## 📁 Structure du projet
+- **Node.js** (version 18 ou supérieure) - [Télécharger ici](https://nodejs.org/)
+- **npm** (inclus avec Node.js)
 
-```
-backend/
-├── src/
-│   ├── config/          # Configuration (DB, Swagger)
-│   ├── controllers/     # Contrôleurs des routes
-│   ├── middleware/      # Middleware (auth, validation, erreurs)
-│   ├── models/          # Interfaces TypeScript
-│   ├── routes/          # Définition des routes
-│   ├── services/        # Services (email, audit)
-│   ├── validations/     # Schémas de validation Zod
-│   └── server.ts        # Point d'entrée de l'application
-├── dist/                # Code compilé
-├── package.json
-├── tsconfig.json
-└── README.md
-```
+## 🔧 Installation
 
-## 🛠️ Installation
+### 1. Installer les dépendances
 
-1. **Cloner le repository**
-```bash
-git clone <repository-url>
-cd backend
-```
-
-2. **Installer les dépendances**
 ```bash
 npm install
 ```
 
-3. **Configuration de l'environnement**
+### 2. Configuration de l'environnement
+
 ```bash
+# Copier le fichier d'exemple
 cp .env.example .env
 ```
 
-Modifier le fichier `.env` avec vos configurations :
-- Base de données PostgreSQL
-- Secrets JWT
-- Configuration SMTP
-- etc.
+**Contenu minimal du fichier `.env` :**
 
-4. **Préparer la base de données**
+```env
+# Database (SQLite pour le développement local)
+DATABASE_URL="file:./dev.db"
 
-Créer la base de données PostgreSQL et exécuter le script SQL fourni pour créer les tables.
+# JWT (Générez vos propres clés sécurisées)
+JWT_SECRET="votre_cle_secrete_jwt_super_longue_et_securisee"
+JWT_REFRESH_SECRET="votre_cle_refresh_jwt_encore_plus_longue_et_securisee"
+JWT_EXPIRES_IN="1h"
+JWT_REFRESH_EXPIRES_IN="30d"
 
-5. **Démarrer en mode développement**
+# Server
+PORT=3000
+NODE_ENV="development"
+
+# Email (Optionnel pour le développement)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="votre_email@gmail.com"
+SMTP_PASS="votre_mot_de_passe_app"
+FROM_EMAIL="noreply@ParabellumGroups.com"
+FROM_NAME="ParabellumGroups System"
+```
+
+### 3. Initialiser la base de données
+
+```bash
+# Générer le client Prisma
+npx prisma generate
+
+# Appliquer les migrations
+npx prisma migrate dev --name init
+
+# Peupler la base de données avec des données de test
+npm run db:seed
+```
+
+## 🚀 Démarrage
+
+### Mode développement
+
 ```bash
 npm run dev
 ```
 
-6. **Build pour la production**
+L'API sera accessible sur : **http://localhost:3000**
+
+### Mode production
+
 ```bash
+# Compiler le TypeScript
 npm run build
+
+# Démarrer en mode production
 npm start
 ```
 
-## 🔧 Configuration
-
-### Variables d'environnement
-
-Copiez `.env.example` vers `.env` et configurez :
-
-```env
-# Base de données
-DATABASE_URL=postgresql://username:password@localhost:5432/progitek_db
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=progitek_db
-DB_USER=username
-DB_PASSWORD=password
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-here
-JWT_EXPIRES_IN=7d
-
-# Email
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-
-# Serveur
-PORT=3000
-NODE_ENV=development
-```
-
-### Base de données
-
-1. Créer une base de données PostgreSQL
-2. Exécuter le script SQL fourni dans le projet principal
-3. Configurer les variables d'environnement
-
-## 📚 Documentation API
-
-Une fois le serveur démarré, la documentation Swagger est disponible à :
-- **Développement** : http://localhost:3000/api-docs
-- **Production** : https://your-domain.com/api-docs
-
-## 🛡️ développeur web
-
-- **Authentification JWT** avec tokens sécurisés
-- **Hashage des mots de passe** avec bcrypt
-- **Validation des données** avec Zod
-- **Rate limiting** pour prévenir les attaques
-- **CORS** configuré
-- **Helmet** pour les en-têtes de développeur web
-- **Audit logging** pour traçabilité
-
-## 🔗 Endpoints principaux
-
-### Authentification
-- `POST /api/v1/auth/login` - Connexion
-- `POST /api/v1/auth/register` - Inscription (admin)
-- `GET /api/v1/auth/me` - Profil utilisateur
-- `POST /api/v1/auth/forgot-password` - Mot de passe oublié
-- `POST /api/v1/auth/reset-password` - Réinitialiser mot de passe
-
-### Utilisateurs
-- `GET /api/v1/users` - Liste des utilisateurs
-- `POST /api/v1/users` - Créer un utilisateur
-- `GET /api/v1/users/:id` - Détails utilisateur
-- `PUT /api/v1/users/:id` - Modifier utilisateur
-- `DELETE /api/v1/users/:id` - Supprimer utilisateur
-
-### Clients
-- `GET /api/v1/clients` - Liste des clients
-- `POST /api/v1/clients` - Créer un client
-- `GET /api/v1/clients/:id` - Détails client
-- `PUT /api/v1/clients/:id` - Modifier client
-- `DELETE /api/v1/clients/:id` - Supprimer client
-
-### Techniciens
-- `GET /api/v1/technicians` - Liste des techniciens
-- `POST /api/v1/technicians` - Créer un technicien
-- `GET /api/v1/technicians/:id` - Détails technicien
-- `PUT /api/v1/technicians/:id` - Modifier technicien
-- `DELETE /api/v1/technicians/:id` - Supprimer technicien
-
-### Missions
-- `GET /api/v1/missions` - Liste des missions
-- `POST /api/v1/missions` - Créer une mission
-- `GET /api/v1/missions/:id` - Détails mission
-- `PUT /api/v1/missions/:id` - Modifier mission
-- `DELETE /api/v1/missions/:id` - Supprimer mission
-
-### Interventions
-- `GET /api/v1/interventions` - Liste des interventions
-- `POST /api/v1/interventions` - Créer une intervention
-- `GET /api/v1/interventions/:id` - Détails intervention
-- `PUT /api/v1/interventions/:id` - Modifier intervention
-- `DELETE /api/v1/interventions/:id` - Supprimer intervention
-
 ## 🧪 Tests
 
-```bash
-# Lancer les tests
-npm test
+### Exécuter tous les tests
 
-# Tests en mode watch
+```bash
+npm test
+```
+
+### Tests en mode watch (surveillance)
+
+```bash
 npm run test:watch
 ```
 
-## 📊 Monitoring
+### Tests avec couverture de code
 
-- **Health check** : `GET /health`
-- **Logs d'audit** : Toutes les actions sont loggées
-- **Logs d'activité** : Connexions et actions utilisateurs
-
-## 🚀 Déploiement
-
-### Avec Docker (recommandé)
-
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY dist ./dist
-EXPOSE 3000
-CMD ["node", "dist/server.js"]
+```bash
+npm run test:coverage
 ```
 
-### Déploiement manuel
+## 📚 Documentation API
 
-1. Build du projet : `npm run build`
-2. Copier les fichiers `dist/` sur le serveur
-3. Installer les dépendances : `npm ci --only=production`
-4. Configurer les variables d'environnement
-5. Démarrer : `npm start`
+Une fois l'API démarrée, accédez à :
 
-## 🤝 Contribution
+- **Documentation Swagger** : http://localhost:3000/api-docs
+- **Health Check** : http://localhost:3000/health
+- **Info API** : http://localhost:3000/api/info
 
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+## 🔐 Comptes de test
 
-## 📝 License
+Après avoir exécuté `npm run db:seed`, vous aurez accès à :
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+**Compte Administrateur :**
+- Email : `admin@example.com`
+- Mot de passe : `admin123`
 
-## 📞 Support
+## 📡 Endpoints principaux
 
-Pour toute question ou problème :
-- Email : support@progitek.com
-- Documentation : http://localhost:3000/api-docs
-- Issues : GitHub Issues
+### Authentication
+```bash
+POST /api/auth/register     # Inscription
+POST /api/auth/login        # Connexion
+POST /api/auth/refresh      # Rafraîchir token
+POST /api/auth/logout       # Déconnexion
+```
+
+### Users
+```bash
+GET  /api/users            # Liste utilisateurs (admin)
+GET  /api/users/profile    # Profil utilisateur
+PUT  /api/users/profile    # Modifier profil
+```
+
+### Clients
+```bash
+GET  /api/clients          # Liste clients
+POST /api/clients          # Créer client
+```
+
+### Techniciens
+```bash
+GET  /api/techniciens      # Liste techniciens
+```
+
+### Missions & Interventions
+```bash
+GET  /api/missions         # Liste missions
+GET  /api/interventions    # Liste interventions
+```
+
+## 🧪 Tester l'API
+
+### 1. Connexion avec curl
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "motDePasse": "admin123"
+  }'
+```
+
+### 2. Utiliser le token reçu
+
+```bash
+# Remplacez YOUR_TOKEN par le token reçu
+curl -X GET http://localhost:3000/api/users/profile \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+## 🛠️ Scripts disponibles
+
+```bash
+npm run dev              # Démarrer en mode développement
+npm run build           # Compiler pour la production
+npm start               # Démarrer en mode production
+npm test                # Exécuter les tests
+npm run test:watch      # Tests en mode surveillance
+npm run test:coverage   # Tests avec couverture
+npm run lint            # Vérifier le code
+npm run lint:fix        # Corriger automatiquement
+npm run db:migrate      # Appliquer les migrations
+npm run db:generate     # Générer le client Prisma
+npm run db:seed         # Peupler la base de données
+npm run db:studio       # Ouvrir Prisma Studio
+npm run db:reset        # Réinitialiser la base de données
+```
+
+## 🏗️ Architecture
+
+```
+src/
+├── config/           # Configuration (database, config, supabase)
+├── controllers/      # Contrôleurs des routes
+├── middleware/       # Middlewares (auth, validation, errors)
+├── models/           # Types et interfaces TypeScript
+├── routes/           # Définition des routes
+├── services/         # Services métier (audit, email)
+├── validations/      # Schémas de validation Zod
+└── server.ts         # Point d'entrée de l'application
+```
+
+## 🔒 Sécurité
+
+- Authentification JWT avec refresh tokens
+- Validation des données avec Zod
+- Rate limiting
+- CORS configuré
+- Audit des actions utilisateur
+- Hashage des mots de passe avec bcrypt
+
+## 🐛 Dépannage
+
+### Problème de port occupé
+
+```bash
+# Trouver le processus utilisant le port 3000
+lsof -i :3000
+
+# Tuer le processus (remplacez PID par l'ID du processus)
+kill -9 PID
+```
+
+### Réinitialiser la base de données
+
+```bash
+npm run db:reset
+```
+
+### Problèmes de dépendances
+
+```bash
+# Nettoyer et réinstaller
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## 📄 Licence
+
+Ce projet est sous licence MIT.
 
 ---
 
-**ProgiTek Backend API** - Système de gestion des interventions techniques
+**🎉 Votre API ParabellumGroups System est maintenant opérationnelle !**

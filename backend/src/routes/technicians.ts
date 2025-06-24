@@ -1,36 +1,275 @@
 import { Router } from 'express';
-import {
-  getTechnicians,
-  getTechnicianById,
-  createTechnician,
-  updateTechnician,
-  deleteTechnician,
-  getSpecialites
-} from '../controllers/technicianController';
-import { authenticateToken, authorizeRoles } from '../middleware/auth';
-import { validateBody } from '../middleware/validation';
+import { Request, Response } from 'express';
+import { prisma } from '../config/database';
+import { authenticateToken } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
+import { auditService } from '../services/auditService';
+import { ApiResponse, PaginatedResponse } from '../models';
 import { createTechnicianSchema, updateTechnicianSchema } from '../validations/technician';
 
 const router = Router();
+router.use(authenticateToken);
 
 /**
  * @swagger
- * tags:
- *   name: Technicians
- *   description: Gestion des techniciens
+ * /api/technicians:
+ *   get:
+ *     summary: Récupérer la liste des techniciens
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
  */
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
 
-// Toutes les routes nécessitent une authentification
-router.use(authenticateToken);
+    const [techniciens, total] = await Promise.all([
+      prisma.technicien.findMany({
+        skip,
+        take: limit,
+        include: {
+          specialite: {
+            select: { libelle: true, description: true },
+          },
+          interventions: {
+            select: { id: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.technicien.count(),
+    ]);
 
-// Routes pour les spécialités
-router.get('/specialites', getSpecialites);
+    const techniciensWithStats = techniciens.map(technicien => ({
+      ...technicien,
+      totalInterventions: technicien.interventions.length,
+    }));
 
-// Routes CRUD
-router.get('/', getTechnicians);
-router.get('/:id', getTechnicianById);
-router.post('/', validateBody(createTechnicianSchema), createTechnician);
-router.put('/:id', validateBody(updateTechnicianSchema), updateTechnician);
-router.delete('/:id', authorizeRoles('Administrator'), deleteTechnician);
+    res.json({
+      success: true,
+      message: 'Techniciens récupérés avec succès',
+      data: techniciensWithStats,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    } as PaginatedResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des techniciens',
+    } as ApiResponse);
+  }
+});
 
-export default router;
+/**
+ * @swagger
+ * /api/technicians:
+ *   post:
+ *     summary: Créer un nouveau technicien
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post('/', validateRequest(createTechnicianSchema), async (req: Request, res: Response) => {
+  try {
+    const technicien = await prisma.technicien.create({
+      data: req.body,
+      include: {
+        specialite: true,
+      },
+    });
+
+    await auditService.logAction({
+      userId: req.user!.id,
+      actionType: 'CREATE',
+      entityType: 'TECHNICIEN',
+      entityId: technicien.id,
+      details: `Technicien ${technicien.nom} ${technicien.prenom} créé`,
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Technicien créé avec succès',
+      data: technicien,
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la création du technicien',
+    } as ApiResponse);
+  }
+});
+
+/**
+ * @swagger
+ * /api/technicians/{id}:
+ *   get:
+ *     summary: Récupérer un technicien par ID
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const technicienId = parseInt(req.params.id);
+    
+    const technicien = await prisma.technicien.findUnique({
+      where: { id: technicienId },
+      include: {
+        specialite: true,
+        interventions: {
+          include: {
+            mission: {
+              include: { client: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!technicien) {
+      return res.status(404).json({
+        success: false,
+        message: 'Technicien non trouvé',
+      } as ApiResponse);
+    }
+
+    res.json({
+      success: true,
+      message: 'Technicien récupéré avec succès',
+      data: technicien,
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération du technicien',
+    } as ApiResponse);
+  }
+});
+
+/**
+ * @swagger
+ * /api/technicians/{id}:
+ *   put:
+ *     summary: Modifier un technicien
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.put('/:id', validateRequest(updateTechnicianSchema), async (req: Request, res: Response) => {
+  try {
+    const technicienId = parseInt(req.params.id);
+    
+    const technicien = await prisma.technicien.update({
+      where: { id: technicienId },
+      data: req.body,
+      include: {
+        specialite: true,
+      },
+    });
+
+    await auditService.logAction({
+      userId: req.user!.id,
+      actionType: 'UPDATE',
+      entityType: 'TECHNICIEN',
+      entityId: technicien.id,
+      details: `Technicien ${technicien.nom} ${technicien.prenom} modifié`,
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: 'Technicien modifié avec succès',
+      data: technicien,
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la modification du technicien',
+    } as ApiResponse);
+  }
+});
+
+/**
+ * @swagger
+ * /api/technicians/{id}:
+ *   delete:
+ *     summary: Supprimer un technicien
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const technicienId = parseInt(req.params.id);
+    
+    const technicien = await prisma.technicien.delete({
+      where: { id: technicienId },
+    });
+
+    await auditService.logAction({
+      userId: req.user!.id,
+      actionType: 'DELETE',
+      entityType: 'TECHNICIEN',
+      entityId: technicien.id,
+      details: `Technicien ${technicien.nom} ${technicien.prenom} supprimé`,
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: 'Technicien supprimé avec succès',
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la suppression du technicien',
+    } as ApiResponse);
+  }
+});
+
+/**
+ * @swagger
+ * /api/technicians/specialites:
+ *   get:
+ *     summary: Récupérer la liste des spécialités
+ *     tags: [Technicians]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/specialites', async (req: Request, res: Response) => {
+  try {
+    const specialites = await prisma.specialite.findMany({
+      include: {
+        techniciens: {
+          select: { id: true },
+        },
+      },
+      orderBy: { libelle: 'asc' },
+    });
+
+    const specialitesWithStats = specialites.map(specialite => ({
+      ...specialite,
+      totalTechniciens: specialite.techniciens.length,
+    }));
+
+    res.json({
+      success: true,
+      message: 'Spécialités récupérées avec succès',
+      data: specialitesWithStats,
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des spécialités',
+    } as ApiResponse);
+  }
+});
+
+export { router as technicianRouter };

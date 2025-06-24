@@ -1,30 +1,54 @@
-import { api } from './api';
-import { Client } from '../types';
+import { apiClient } from './api';
+import { Client, PaginatedResponse } from '../types/api';
 
-export const clientService = {
-  async getClients(page = 1, limit = 10, search?: string): Promise<{ clients: Client[]; total: number }> {
-    const response = await api.get('/clients', {
-      params: { page, limit, search }
+export interface CreateClientData {
+  nom: string;
+  email: string;
+  telephone?: string;
+  entreprise?: string;
+  typeDeCart?: string;
+  statut?: 'active' | 'inactive';
+  localisation?: string;
+}
+
+class ClientService {
+  // Lister les clients
+  async getClients(page = 1, limit = 10, search?: string): Promise<PaginatedResponse<Client>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
     });
-    return response.data;
-  },
+    
+    if (search) {
+      params.append('search', search);
+    }
 
-  async getClientById(id: number): Promise<Client> {
-    const response = await api.get(`/clients/${id}`);
+    const response = await apiClient.get(`/clients?${params}`);
     return response.data;
-  },
-
-  async createClient(clientData: Partial<Client>): Promise<Client> {
-    const response = await api.post('/clients', clientData);
-    return response.data;
-  },
-
-  async updateClient(id: number, clientData: Partial<Client>): Promise<Client> {
-    const response = await api.put(`/clients/${id}`, clientData);
-    return response.data;
-  },
-
-  async deleteClient(id: number): Promise<void> {
-    await api.delete(`/clients/${id}`);
   }
-};
+
+  // Créer un client
+  async createClient(clientData: CreateClientData): Promise<Client> {
+    const response = await apiClient.post('/clients', clientData);
+    return response.data.data;
+  }
+
+  // Récupérer un client par ID
+  async getClientById(id: number): Promise<Client> {
+    const response = await apiClient.get(`/clients/${id}`);
+    return response.data.data;
+  }
+
+  // Modifier un client
+  async updateClient(id: number, clientData: Partial<CreateClientData>): Promise<Client> {
+    const response = await apiClient.put(`/clients/${id}`, clientData);
+    return response.data.data;
+  }
+
+  // Supprimer un client
+  async deleteClient(id: number): Promise<void> {
+    await apiClient.delete(`/clients/${id}`);
+  }
+}
+
+export const clientService = new ClientService();

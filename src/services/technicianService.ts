@@ -1,53 +1,48 @@
-import { api } from './api';
-import { Technicien, Specialite } from '../types';
+import { apiClient } from './api';
+import { Technicien, Specialite, PaginatedResponse } from '../types/api';
 
-export const technicianService = {
-  async getTechnicians(page = 1, limit = 10, search?: string, filters?: any): Promise<{ technicians: Technicien[]; total: number }> {
-    const response = await api.get('/technicians', {
-      params: { page, limit, search, ...filters }
-    });
-    return response.data;
-  },
+export interface CreateTechnicianData {
+  nom: string;
+  prenom: string;
+  contact?: string;
+  specialiteId?: number;
+}
 
-  async getTechnicianById(id: number): Promise<Technicien> {
-    const response = await api.get(`/technicians/${id}`);
-    return response.data;
-  },
-
-  async createTechnician(technicianData: Partial<Technicien>): Promise<Technicien> {
-    const response = await api.post('/technicians', technicianData);
-    return response.data;
-  },
-
-  async updateTechnician(id: number, technicianData: Partial<Technicien>): Promise<Technicien> {
-    const response = await api.put(`/technicians/${id}`, technicianData);
-    return response.data;
-  },
-
-  async deleteTechnician(id: number): Promise<void> {
-    await api.delete(`/technicians/${id}`);
-  },
-
-  async getSpecialites(): Promise<Specialite[]> {
-    const response = await api.get('/technicians/specialites');
-    return response.data;
-  },
-
-  async getTechniciansBySpeciality(specialityId: number): Promise<Technicien[]> {
-    const response = await api.get(`/technicians/speciality/${specialityId}`);
-    return response.data;
-  },
-
-  async getTechnicianAvailability(technicianId: number, startDate: string, endDate: string): Promise<any> {
-    const response = await api.get(`/technicians/${technicianId}/availability`, {
-      params: { start_date: startDate, end_date: endDate }
-    });
-    return response.data;
-  },
-
-  async getTechnicianStats(technicianId?: number): Promise<any> {
-    const url = technicianId ? `/technicians/${technicianId}/stats` : '/technicians/stats';
-    const response = await api.get(url);
+class TechnicianService {
+  // Lister les techniciens
+  async getTechnicians(page = 1, limit = 10): Promise<PaginatedResponse<Technicien>> {
+    const response = await apiClient.get(`/technicians?page=${page}&limit=${limit}`);
     return response.data;
   }
-};
+
+  // Créer un technicien
+  async createTechnician(technicianData: CreateTechnicianData): Promise<Technicien> {
+    const response = await apiClient.post('/technicians', technicianData);
+    return response.data.data;
+  }
+
+  // Récupérer un technicien par ID
+  async getTechnicianById(id: number): Promise<Technicien> {
+    const response = await apiClient.get(`/technicians/${id}`);
+    return response.data.data;
+  }
+
+  // Modifier un technicien
+  async updateTechnician(id: number, technicianData: Partial<CreateTechnicianData>): Promise<Technicien> {
+    const response = await apiClient.put(`/technicians/${id}`, technicianData);
+    return response.data.data;
+  }
+
+  // Supprimer un technicien
+  async deleteTechnician(id: number): Promise<void> {
+    await apiClient.delete(`/technicians/${id}`);
+  }
+
+  // Récupérer les spécialités
+  async getSpecialites(): Promise<Specialite[]> {
+    const response = await apiClient.get('/specialites');
+    return response.data.data;
+  }
+}
+
+export const technicianService = new TechnicianService();

@@ -1,116 +1,89 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { supabase } from '../config/supabase';
-import { createError } from './errorHandler';
+import { prisma } from '../config/database';
+import { config } from '../config/config';
+import { ApiResponse } from '../models';
 
-export interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    role: string;
-  };
+// Interface pour le payload JWT
+interface JwtPayload {
+  id: number;
+  email: string;
+  role: string;
 }
 
-export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
+// Étendre l'interface Request pour inclure user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: number;
+        email: string;
+        role: string;
+      };
+    }
+  }
+}
+
+// Middleware d'authentification
+export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      return next(createError("Token d'accès requis", 401));
+      return res.status(401).json({
+        success: false,
+        message: 'Token d\'accès requis',
+      } as ApiResponse);
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as any;
+    const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;
     
-    // Vérifier que l'utilisateur existe toujours et est actif
-    const { data: user, error } = await supabase
-      .from('utilisateur')
-      .select('id, email, status, role:role_id(libelle)')
-      .eq('id', decoded.id)
-      .single();
+    // Vérifier que l'utilisateur existe toujours
+    const user = await prisma.utilisateur.findUnique({
+      where: { id: decoded.id },
+      include: { role: true },
+    });
 
-    if (error || !user) {
-      return next(createError("Utilisateur non trouvé", 401));
-    }
-
-    if (user.status !== 'active') {
-      return next(createError('Compte désactivé', 401));
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Utilisateur non trouvé',
+      } as ApiResponse);
     }
 
     req.user = {
       id: user.id,
       email: user.email,
-      role: user.role && user.role.length > 0 ? user.role[0].libelle : 'utilisateur'
+      role: user.role.libelle,
     };
 
     next();
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({
-        success: false,
-        message: 'Token invalide'
-      });
-    }
-    next(error);
-  }
-};
-
-export const requireRole = (roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentification requise'
-      });
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Permissions insuffisantes'
-      });
-    }
-
-    return next();
-  };
-};
-
-export const authorizeRoles = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentification requise'
-      });
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Permissions insuffisantes'
-      });
-    }
-
-    return next();
-  };
-};
-
-export const authorizeOwnerOrAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return res.status(401).json({
-      success: false,
-      message: 'Authentification requise'
-    });
-  }
-
-  const userId = parseInt(req.params.id);
-  
-  if (req.user.role === 'Administrator' || req.user.id === userId) {
-    return next();
-  } else {
     return res.status(403).json({
       success: false,
-      message: 'Permissions insuffisantes'
-    });
+      message: 'Token invalide',
+    } as ApiResponse);
   }
+};
+
+// Middleware de vérification des rôles
+export const requireRole = (roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentification requise',
+      } as ApiResponse);
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Permissions insuffisantes',
+      } as ApiResponse);
+    }
+
+    next();
+  };
 };

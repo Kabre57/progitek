@@ -1,42 +1,21 @@
 import { z } from 'zod';
 
 export const createInterventionSchema = z.object({
-  date_heure_debut: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'Format de date/heure invalide'),
-  date_heure_fin: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'Format de date/heure invalide'),
-  mission_id: z
-    .number()
-    .int('L\'ID de la mission doit être un entier')
-    .positive('L\'ID de la mission doit être positif'),
-  technicien_id: z
-    .number()
-    .int('L\'ID du technicien doit être un entier')
-    .positive('L\'ID du technicien doit être positif')
-    .optional()
+  body: z.object({
+    dateHeureDebut: z.string().datetime().optional(),
+    dateHeureFin: z.string().datetime().optional(),
+    duree: z.number().positive().optional(),
+    missionId: z.number().int().positive(),
+    technicienId: z.number().int().positive().optional(),
+  }),
 });
 
 export const updateInterventionSchema = z.object({
-  date_heure_debut: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'Format de date/heure invalide'),
-  date_heure_fin: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'Format de date/heure invalide'),
-  mission_id: z
-    .number()
-    .int('L\'ID de la mission doit être un entier')
-    .positive('L\'ID de la mission doit être positif')
-    .optional(),
-  technicien_id: z
-    .number()
-    .int('L\'ID du technicien doit être un entier')
-    .positive('L\'ID du technicien doit être positif')
-    .optional()
+  body: z.object({
+    dateHeureDebut: z.string().datetime().optional(),
+    dateHeureFin: z.string().datetime().optional(),
+    duree: z.number().positive().optional(),
+    missionId: z.number().int().positive().optional(),
+    technicienId: z.number().int().positive().optional(),
+  }),
 });

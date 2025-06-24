@@ -1,150 +1,146 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, UserCheck, Phone, Wrench } from 'lucide-react';
-import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { Technicien, Specialite } from '../../types';
+import { X, Save, Loader } from 'lucide-react';
+import { technicianService, CreateTechnicianData } from '../../services/technicianService';
+import { Technicien, Specialite } from '../../types/api';
 import toast from 'react-hot-toast';
 
 interface TechnicianModalProps {
   isOpen: boolean;
   onClose: () => void;
-  technician?: Technicien | null;
-  onSave: (technicianData: any) => Promise<void>;
-  specialites: Specialite[];
+  onSuccess: () => void;
+  technicien?: Technicien | null;
 }
 
-export const TechnicianModal: React.FC<TechnicianModalProps> = ({
-  isOpen,
-  onClose,
-  technician,
-  onSave,
-  specialites
-}) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+export const TechnicianModal: React.FC<TechnicianModalProps> = ({ isOpen, onClose, onSuccess, technicien }) => {
+  const [loading, setLoading] = useState(false);
+  const [specialites, setSpecialites] = useState<Specialite[]>([]);
+  const [formData, setFormData] = useState<CreateTechnicianData>({
     nom: '',
     prenom: '',
     contact: '',
-    specialite_id: ''
+    specialiteId: undefined
   });
 
   useEffect(() => {
-    if (technician) {
+    if (isOpen) {
+      loadSpecialites();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (technicien) {
       setFormData({
-        nom: technician.nom || '',
-        prenom: technician.prenom || '',
-        contact: technician.contact || '',
-        specialite_id: technician.specialite?.id?.toString() || ''
+        nom: technicien.nom,
+        prenom: technicien.prenom,
+        contact: technicien.contact || '',
+        specialiteId: technicien.specialiteId
       });
     } else {
       setFormData({
         nom: '',
         prenom: '',
         contact: '',
-        specialite_id: ''
+        specialiteId: undefined
       });
     }
-  }, [technician, isOpen]);
+  }, [technicien, isOpen]);
+
+  const loadSpecialites = async () => {
+    try {
+      const data = await technicianService.getSpecialites();
+      setSpecialites(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des spécialités:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
 
     try {
-      const submitData = {
-        ...formData,
-        specialite_id: parseInt(formData.specialite_id)
-      };
-
-      await onSave(submitData);
+      if (technicien) {
+        await technicianService.updateTechnician(technicien.id, formData);
+        toast.success('Technicien modifié avec succès');
+      } else {
+        await technicianService.createTechnician(formData);
+        toast.success('Technicien créé avec succès');
+      }
+      onSuccess();
       onClose();
-      toast.success(technician ? 'Technicien modifié avec succès' : 'Technicien créé avec succès');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la sauvegarde');
+      toast.error(error.response?.data?.message || 'Erreur lors de l\'opération');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        {/* En-tête */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
-              <UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {technician ? 'Modifier le technicien' : 'Nouveau technicien'}
-            </h2>
-          </div>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">
+            {technicien ? 'Modifier le technicien' : 'Nouveau technicien'}
+          </h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="text-gray-400 hover:text-gray-600"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="h-6 w-6" />
           </button>
         </div>
 
-        {/* Formulaire */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Prénom *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.prenom}
-                onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="Konan"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nom *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.nom}
-                onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="Yane"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nom *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.nom}
+              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Phone className="w-4 h-4 inline mr-1" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Prénom *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.prenom}
+              onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Contact
             </label>
             <input
               type="tel"
               value={formData.contact}
               onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="+225 06 12 34 56 78"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Wrench className="w-4 h-4 inline mr-1" />
-              Spécialité *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Spécialité
             </label>
             <select
-              required
-              value={formData.specialite_id}
-              onChange={(e) => setFormData({ ...formData, specialite_id: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              value={formData.specialiteId || ''}
+              onChange={(e) => setFormData({ ...formData, specialiteId: e.target.value ? parseInt(e.target.value) : undefined })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Sélectionner une spécialité</option>
+              <option value="">Sélectionner une spécialité...</option>
               {specialites.map((specialite) => (
                 <option key={specialite.id} value={specialite.id}>
                   {specialite.libelle}
@@ -153,26 +149,30 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({
             </select>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
               Annuler
             </button>
             <button
               type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors disabled:opacity-50 flex items-center"
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
             >
-              {isLoading ? (
-                <LoadingSpinner size="sm" className="mr-2" />
+              {loading ? (
+                <>
+                  <Loader className="h-4 w-4 mr-2 animate-spin" />
+                  Enregistrement...
+                </>
               ) : (
-                <Save className="w-4 h-4 mr-2" />
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {technicien ? 'Modifier' : 'Créer'}
+                </>
               )}
-              {technician ? 'Modifier' : 'Créer'}
             </button>
           </div>
         </form>

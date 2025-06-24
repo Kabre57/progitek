@@ -1,90 +1,57 @@
 import { Request, Response, NextFunction } from 'express';
-
-export interface AppError extends Error {
-  statusCode?: number;
-  isOperational?: boolean;
-}
+import { ApiResponse } from '../models';
 
 export const errorHandler = (
-  error: AppError,
+  error: any,
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  let statusCode = error.statusCode || 500;
-  let message = error.message || 'Erreur interne du serveur';
+) => {
+  console.error('Error:', error);
 
-  // Erreurs de validation Zod
-  if (error.name === 'ZodError') {
-    statusCode = 400;
-    message = 'Données de validation invalides';
-  }
-
-  // Erreurs JWT
-  if (error.name === 'JsonWebTokenError') {
-    statusCode = 401;
-    message = 'Token invalide';
-  }
-
-  if (error.name === 'TokenExpiredError') {
-    statusCode = 401;
-    message = 'Token expiré';
-  }
-
-  // Erreurs PostgreSQL
-  if (error.name === 'DatabaseError') {
-    statusCode = 500;
-    message = 'Erreur de base de données';
-  }
-
-  // Erreur de contrainte unique (email déjà utilisé, etc.)
-  if (error.message?.includes('duplicate key value')) {
-    statusCode = 409;
-    message = 'Cette ressource existe déjà';
+  // Erreur de validation Prisma
+  if (error.code === 'P2002') {
+    return res.status(409).json({
+      success: false,
+      message: 'Cette ressource existe déjà',
+      errors: [{
+        field: error.meta?.target?.[0] || 'unknown',
+        message: 'Valeur déjà utilisée'
+      }]
+    } as ApiResponse);
   }
 
   // Erreur de contrainte de clé étrangère
-  if (error.message?.includes('foreign key constraint')) {
-    statusCode = 400;
-    message = 'Référence invalide vers une ressource inexistante';
+  if (error.code === 'P2003') {
+    return res.status(400).json({
+      success: false,
+      message: 'Référence invalide',
+    } as ApiResponse);
   }
 
-  // Log de l'erreur en développement
-  if (process.env.NODE_ENV === 'development') {
-    console.error('🚨 Erreur capturée:', {
-      message: error.message,
-      stack: error.stack,
-      statusCode,
-      url: req.url,
-      method: req.method,
-      body: req.body,
-      params: req.params,
-      query: req.query
-    });
+  // Erreur de validation Zod
+  if (error.name === 'ZodError') {
+    return res.status(400).json({
+      success: false,
+      message: 'Données invalides',
+      errors: error.errors.map((err: any) => ({
+        field: err.path.join('.'),
+        message: err.message
+      }))
+    } as ApiResponse);
   }
 
-  // Réponse d'erreur
-  res.status(statusCode).json({
+  // Erreur JWT
+  if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Token invalide',
+    } as ApiResponse);
+  }
+
+  // Erreur par défaut
+  res.status(500).json({
     success: false,
-    message,
-    ...(process.env.NODE_ENV === 'development' && {
-      error: error.message,
-      stack: error.stack
-    })
-  });
-};
-
-// Fonction utilitaire pour créer des erreurs personnalisées
-export const createError = (message: string, statusCode: number = 500): AppError => {
-  const error: AppError = new Error(message);
-  error.statusCode = statusCode;
-  error.isOperational = true;
-  return error;
-};
-
-// Wrapper pour les fonctions async
-export const asyncHandler = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+    message: 'Erreur interne du serveur',
+  } as ApiResponse);
 };
