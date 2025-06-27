@@ -11,10 +11,10 @@ export const config = {
     url: process.env.DATABASE_URL || 'file:./dev.db',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-in-production',
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
+    secret: (process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production') as string,
+    refreshSecret: (process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-in-production') as string,
+    expiresIn: (process.env.JWT_EXPIRES_IN || '1h') as string,
+    refreshExpiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '30d') as string,
   },
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',

@@ -21,7 +21,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { generateFacturePDF } from '../utils/pdfGenerator';
+import { generateFacturePDF } from '../utils/generateFacturePDF';
 
 export const FacturesPage: React.FC = () => {
   const [page, setPage] = useState(1);

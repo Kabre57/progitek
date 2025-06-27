@@ -179,7 +179,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Contenu principal */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         {/* Header */}
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+        <div className="relative z-0 flex-shrink-0 flex h-16 bg-white shadow">
           <button
             className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"
             onClick={() => setSidebarOpen(true)}
