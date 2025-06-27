@@ -18,7 +18,7 @@ interface LigneDevis {
   designation: string;
   quantite: number;
   prixUnitaire: number;
-  montantHT: number;
+  montantHT?: number;
 }
 
 export const DevisModal: React.FC<DevisModalProps> = ({ isOpen, onClose, onSuccess, devis }) => {
@@ -32,11 +32,14 @@ export const DevisModal: React.FC<DevisModalProps> = ({ isOpen, onClose, onSucce
     description: '',
     dateValidite: '',
     tauxTVA: 18,
-    lignes: [
+   lignes: [
       {
-        designation: '',
+        designation: 
+
+"",
         quantite: 1,
         prixUnitaire: 0,
+        montantHT: 0
       }
     ]
   });
@@ -56,7 +59,7 @@ export const DevisModal: React.FC<DevisModalProps> = ({ isOpen, onClose, onSucce
         titre: devis.titre,
         description: devis.description || '',
         dateValidite: devis.dateValidite.split('T')[0],
-        tauxTVA: devis.tauxTVA,
+        tauxTVA: devis.tauxTVA || 0,
         lignes: devis.lignes?.map(ligne => ({
           id: ligne.id,
           designation: ligne.designation,
@@ -72,15 +75,16 @@ export const DevisModal: React.FC<DevisModalProps> = ({ isOpen, onClose, onSucce
         titre: '',
         description: '',
         dateValidite: '',
-        tauxTVA: 18,
-        lignes: [
+        tauxTVA: 18,        lignes: [
           {
-            designation: '',
+            designation: 
+
+"",
             quantite: 1,
             prixUnitaire: 0,
+            montantHT: 0
           }
-        ]
-      });
+        ]      });
     }
   }, [devis, isOpen]);
 

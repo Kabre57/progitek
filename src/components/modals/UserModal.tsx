@@ -70,7 +70,7 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess
     try {
       if (user) {
         // For updates, only send password if it was changed
-        const updateData = { ...formData };
+        const updateData: Partial<CreateUserData> = { ...formData };
         if (!updateData.motDePasse) {
           delete updateData.motDePasse;
         }

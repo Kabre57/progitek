@@ -16,7 +16,7 @@ export default defineConfig({
     // Configuration proxy pour éviter les problèmes CORS en développement
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

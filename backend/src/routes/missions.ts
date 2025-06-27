@@ -76,6 +76,23 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.post('/', validateRequest(createMissionSchema), async (req: Request, res: Response) => {
   try {
+    const { clientId, dateSortieFicheIntervention } = req.body;
+
+    const clientExists = await prisma.client.findUnique({
+      where: { id: clientId }
+    });
+
+    if (!clientExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Client inexistant pour l'ID fourni"
+      });
+    }
+
+    if (dateSortieFicheIntervention) {
+      req.body.dateSortieFicheIntervention = new Date(dateSortieFicheIntervention);
+    }
+
     const mission = await prisma.mission.create({
       data: req.body,
       include: {
@@ -96,12 +113,12 @@ router.post('/', validateRequest(createMissionSchema), async (req: Request, res:
       success: true,
       message: 'Mission créée avec succès',
       data: mission,
-    } as ApiResponse);
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de la mission',
-    } as ApiResponse);
+    });
   }
 });
 
@@ -161,13 +178,30 @@ router.get('/:id', async (req: Request, res: Response) => {
  *     security:
  *       - bearerAuth: []
  */
-router.put('/:id', validateRequest(updateMissionSchema), async (req: Request, res: Response) => {
+router.put("/:id", validateRequest(updateMissionSchema), async (req: Request, res: Response) => {
   try {
     const missionId = parseInt(req.params.id);
-    
+    const { dateSortieFicheIntervention, ...rest } = req.body;
+
+    const existingMission = await prisma.mission.findUnique({
+      where: { numIntervention: missionId },
+    });
+
+    if (!existingMission) {
+      return res.status(404).json({
+        success: false,
+        message: "Mission non trouvée.",
+      });
+    }
+
+    let dataToUpdate: any = { ...rest };
+    if (dateSortieFicheIntervention) {
+      dataToUpdate.dateSortieFicheIntervention = new Date(dateSortieFicheIntervention);
+    }
+
     const mission = await prisma.mission.update({
       where: { numIntervention: missionId },
-      data: req.body,
+      data: dataToUpdate,
       include: {
         client: true,
       },
@@ -234,3 +268,4 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 export { router as missionRouter };
+

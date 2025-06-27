@@ -147,6 +147,7 @@ export const SpecialitesPage: React.FC = () => {
 
       {/* Table des spécialités */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
+       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -216,7 +217,7 @@ export const SpecialitesPage: React.FC = () => {
                         onClick={() => handleDelete(specialite.id)}
                         className="text-red-600 hover:text-red-900"
                         title="Supprimer"
-                        disabled={specialite.totalTechniciens > 0}
+                        disabled={(specialite.totalTechniciens || 0) > 0}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -227,6 +228,7 @@ export const SpecialitesPage: React.FC = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}

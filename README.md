@@ -1,11 +1,11 @@
-# 🚀 ParabellumGroups Frontend - Interface Parabellum
+# 🚀 ProgiTek Frontend - Interface Parabellum
 
-Interface utilisateur moderne basée sur le design Parabellum pour le système de gestion technique ParabellumGroups.
+Interface utilisateur moderne basée sur le design Parabellum pour le système de gestion technique ProgiTek.
 
 ## 📋 Fonctionnalités Implémentées
 
 ### ✅ **Pages Complètes**
-- **🔐 Connexion** - Interface moderne avec logo ParabellumGroups
+- **🔐 Connexion** - Interface moderne avec logo ProgiTek
 - **📊 Dashboard** - Tableau de bord avec statistiques
 - **👥 Clients** - Gestion complète avec statistiques et CRUD
 - **🔧 Techniciens** - Gestion avec spécialités et répartition
@@ -38,7 +38,7 @@ npm run dev
 ## 📱 Pages Disponibles
 
 ### 🔐 **Page de Connexion**
-- Design moderne avec logo ParabellumGroups
+- Design moderne avec logo ProgiTek
 - Formulaire avec validation
 - Gestion des erreurs
 - Identifiants par défaut : admin@example.com / admin123
@@ -150,4 +150,4 @@ Vous avez maintenant une interface moderne et professionnelle qui reproduit fid�
 - ✅ **Responsive design** mobile/desktop
 - ✅ **Code modulaire** et maintenable
 
-**🚀 Votre système ParabellumGroups est maintenant prêt avec une interface utilisateur moderne et fonctionnelle !**
+**🚀 Votre système ProgiTek est maintenant prêt avec une interface utilisateur moderne et fonctionnelle !**

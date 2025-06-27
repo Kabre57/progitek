@@ -166,7 +166,6 @@ export interface Devis {
   facture?: Facture;
   lignes?: DevisLigne[];
 }
-
 export interface DevisLigne {
   id: number;
   devisId: number;
@@ -175,27 +174,6 @@ export interface DevisLigne {
   prixUnitaire: number;
   montantHT: number;
   ordre: number;
-}
-
-export interface Facture {
-  id: number;
-  numero: string;
-  devisId: number;
-  clientId: number;
-  montantHT: number;
-  tauxTVA: number;
-  montantTTC: number;
-  statut: 'emise' | 'envoyee' | 'payee' | 'annulee';
-  dateEmission: string;
-  dateEcheance: string;
-  datePaiement?: string;
-  modePaiement?: string;
-  referenceTransaction?: string;
-  createdAt: string;
-  updatedAt: string;
-  devis?: Devis;
-  client?: Client;
-  lignes?: FactureLigne[];
 }
 
 export interface FactureLigne {

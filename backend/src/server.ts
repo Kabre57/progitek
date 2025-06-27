@@ -29,7 +29,7 @@ import { devisRouter } from './routes/devis';
 import { factureRouter } from './routes/factures';
 
 const app = express();
-const PORT = config.server.port || 3001;
+const PORT = config.server.port || 3000;
 
 // Create logs directory if it doesn't exist
 const logsDir = path.dirname(config.logging.file);
@@ -39,7 +39,8 @@ if (!fs.existsSync(logsDir)) {
 
 // CORS Configuration - CORRECTION DU PROBLÈME
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Allow frontend origins
+  origin: ['http://localhost:5173', 
+          'http://localhost:5174'], // Allow frontend origins
   credentials: false, // Changed from true to false to fix CORS issues
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [

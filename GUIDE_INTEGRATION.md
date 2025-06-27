@@ -1,11 +1,11 @@
-# 🚀 Guide d'Intégration Frontend - ParabellumGroups System
+# 🚀 Guide d'Intégration Frontend - Progitek System
 
 ## 📋 Prérequis
 
 Avant de commencer, assurez-vous d'avoir :
 - **Node.js** 18+ installé
 - **npm** ou **yarn**
-- **Backend API** ParabellumGroups System en cours d'exécution sur `http://localhost:3000`
+- **Backend API** Progitek System en cours d'exécution sur `http://localhost:3000`
 
 ## 🔧 Installation
 
@@ -25,7 +25,7 @@ cp .env.example .env
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api
 VITE_API_VERSION=v1
-VITE_APP_NAME=ParabellumGroups System
+VITE_APP_NAME=Progitek System
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -284,7 +284,7 @@ apiClient.interceptors.request.use(request => {
 
 ---
 
-**🎉 Votre frontend React est maintenant intégré avec l'API ParabellumGroups System !**
+**🎉 Votre frontend React est maintenant intégré avec l'API Progitek System !**
 
 L'application offre :
 - ✅ Authentification complète avec JWT

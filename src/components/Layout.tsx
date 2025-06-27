@@ -77,7 +77,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
                   PS
                 </div>
-                <span className="ml-2 text-xl font-bold text-gray-900">ParabellumGroups</span>
+                <span className="ml-2 text-xl font-bold text-gray-900">ProgiTek</span>
               </div>
             </div>
             <nav className="mt-5 px-2 space-y-1">
@@ -122,7 +122,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
                   PS
                 </div>
-                <span className="ml-2 text-xl font-bold text-gray-900">ParabellumGroups</span>
+                <span className="ml-2 text-xl font-bold text-gray-900">ProgiTek</span>
               </div>
               
               {/* Profil utilisateur dans la sidebar */}
