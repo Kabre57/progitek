@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { prisma } from '../config/database';
 import { config } from '../config/config';
 import { auditService } from '../services/auditService';
 import { ApiResponse } from '../models';
 
-const jwtSecret = config.jwt.secret as string;
-const jwtRefreshSecret = config.jwt.refreshSecret as string;
+const jwtSecret: Secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+const jwtRefreshSecret: Secret = process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-in-production';
 
 export const authController = {
   async login(req: Request, res: Response) {
@@ -26,13 +26,13 @@ export const authController = {
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
         jwtSecret,
-        { expiresIn: config.jwt.expiresIn }
+        { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       const refreshToken = jwt.sign(
         { id: user.id },
         jwtRefreshSecret,
-        { expiresIn: config.jwt.refreshExpiresIn }
+        { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
       );
 
       await prisma.utilisateur.update({
@@ -122,13 +122,13 @@ export const authController = {
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
         jwtSecret,
-        { expiresIn: config.jwt.expiresIn }
+        { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       const refreshToken = jwt.sign(
         { id: user.id },
         jwtRefreshSecret,
-        { expiresIn: config.jwt.refreshExpiresIn }
+        { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
       );
 
       await auditService.logAction({
@@ -206,7 +206,7 @@ export const authController = {
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
         jwtSecret,
-        { expiresIn: config.jwt.expiresIn }
+        { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       res.json({
@@ -220,9 +220,9 @@ export const authController = {
     }
   },
 
-  async requestPasswordReset(req: Request, res: Response) {
+  async requestPasswordReset(_req: Request, res: Response) {
     try {
-      const { email } = req.body;
+      const { email } = _req.body;
 
       const user = await prisma.utilisateur.findUnique({ where: { email } });
 
@@ -233,7 +233,7 @@ export const authController = {
 
       if (user) {
         // Générer un token de réinitialisation
-        // Envoyer l'email
+        // Envoyer l\'email
       }
     } catch (error) {
       console.error('Password reset request error:', error);
@@ -244,7 +244,7 @@ export const authController = {
     }
   },
 
-  async resetPassword(req: Request, res: Response) {
+  async resetPassword(_req: Request, res: Response) {
     try {
       res.json({
         success: true,
@@ -256,3 +256,4 @@ export const authController = {
     }
   },
 };
+

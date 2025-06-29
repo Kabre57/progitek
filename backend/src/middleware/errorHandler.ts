@@ -3,9 +3,9 @@ import { ApiResponse } from '../models';
 
 export const errorHandler = (
   error: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   console.error('Error:', error);
 
@@ -55,3 +55,4 @@ export const errorHandler = (
     message: 'Erreur interne du serveur',
   } as ApiResponse);
 };
+

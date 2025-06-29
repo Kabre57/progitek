@@ -39,7 +39,7 @@ if (!fs.existsSync(logsDir)) {
 
 // CORS Configuration - CORRECTION DU PROBLÈME
 const corsOptions = {
-  origin: ['http://localhost:5173', 
+  origin: ['http://localhost:5173',
           'http://localhost:5174'], // Allow frontend origins
   credentials: false, // Changed from true to false to fix CORS issues
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -138,7 +138,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'OK',
     message: 'Serveur en fonctionnement',
@@ -149,7 +149,7 @@ app.get('/health', (req, res) => {
 });
 
 // API info endpoint
-app.get('/api/info', (req, res) => {
+app.get('/api/info', (_req, res) => {
   res.json({
     name: 'ParabellumGroups System API',
     version: '1.0.0',
@@ -206,3 +206,4 @@ app.listen(PORT, () => {
 });
 
 export default app;
+

@@ -453,7 +453,7 @@ router.put('/profile', validateRequest(updateUserSchema), async (req: Request, r
  *     security:
  *       - bearerAuth: []
  */
-router.get('/roles', async (req: Request, res: Response) => {
+router.get('/roles', async (_req: Request, res: Response) => {
   try {
     const roles = await prisma.role.findMany({
       orderBy: { libelle: 'asc' },
@@ -474,3 +474,4 @@ router.get('/roles', async (req: Request, res: Response) => {
 });
 
 export { router as userRouter };
+

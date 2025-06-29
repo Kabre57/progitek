@@ -5,11 +5,11 @@ import { authenticateToken, requireRole } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { auditService } from '../services/auditService';
 import { ApiResponse, PaginatedResponse } from '../models';
-import { 
-  createDevisSchema, 
-  updateDevisSchema, 
+import {
+  createDevisSchema,
+  updateDevisSchema,
   validateDevisSchema,
-  responseDevisSchema 
+  responseDevisSchema
 } from '../validations/devis';
 
 const router = Router();
@@ -97,7 +97,7 @@ router.post('/', validateRequest(createDevisSchema), async (req: Request, res: R
 
     // Calculer les montants
     let montantHT = 0;
-    const lignesWithMontant = lignes.map((ligne: any, index: number) => {
+    const lignesToCreate = lignes.map((ligne: any, index: number) => {
       const montantLigne = ligne.quantite * ligne.prixUnitaire;
       montantHT += montantLigne;
       return {
@@ -130,7 +130,7 @@ router.post('/', validateRequest(createDevisSchema), async (req: Request, res: R
         statut: 'brouillon',
         dateCreation: new Date(),
         lignes: {
-          create: lignesWithMontant,
+          create: lignesToCreate,
         },
       },
       include: {
@@ -248,7 +248,7 @@ router.put('/:id', validateRequest(updateDevisSchema), async (req: Request, res:
     // Si des lignes sont fournies, recalculer les montants
     if (lignes) {
       let montantHT = 0;
-      const lignesWithMontant = lignes.map((ligne: any, index: number) => {
+      const lignesMapped = lignes.map((ligne: any, index: number) => {
         const montantLigne = ligne.quantite * ligne.prixUnitaire;
         montantHT += montantLigne;
         return {
@@ -271,21 +271,16 @@ router.put('/:id', validateRequest(updateDevisSchema), async (req: Request, res:
       await prisma.devisLigne.deleteMany({
         where: { devisId },
       });
+
+      updateData.lignes = {
+        create: lignesMapped,
+      };
     }
 
     const devis = await prisma.devis.update({
       where: { id: devisId },
       data: {
         ...updateData,
-        ...(lignes && {
-          lignes: {
-            create: lignes.map((ligne: any, index: number) => ({
-              ...ligne,
-              montantHT: ligne.quantite * ligne.prixUnitaire,
-              ordre: index + 1,
-            })),
-          },
-        }),
       },
       include: {
         client: true,
@@ -579,3 +574,5 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 export { router as devisRouter };
+
+

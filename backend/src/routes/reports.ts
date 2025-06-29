@@ -18,7 +18,7 @@ router.use(authenticateToken);
  *     security:
  *       - bearerAuth: []
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     const reports = await prisma.report.findMany({
       include: {
@@ -62,13 +62,13 @@ router.post('/generate', validateRequest(generateReportSchema), async (req: Requ
         reportData = await generateClientsReport(startDate, endDate, filters);
         break;
       case 'missions':
-        reportData = await generateMissionsReport(startDate, endDate, filters);
+        reportData = await generateMissionsReport(startDate, endDate);
         break;
       case 'interventions':
-        reportData = await generateInterventionsReport(startDate, endDate, filters);
+        reportData = await generateInterventionsReport(startDate, endDate);
         break;
       case 'techniciens':
-        reportData = await generateTechniciensReport(startDate, endDate, filters);
+        reportData = await generateTechniciensReport(startDate, endDate);
         break;
       default:
         return res.status(400).json({
@@ -109,7 +109,7 @@ router.post('/generate', validateRequest(generateReportSchema), async (req: Requ
  *     security:
  *       - bearerAuth: []
  */
-router.get('/dashboard', async (req: Request, res: Response) => {
+router.get('/dashboard', async (_req: Request, res: Response) => {
   try {
     const dashboardData = await generateDashboardReport();
 
@@ -166,7 +166,7 @@ async function generateClientsReport(startDate?: string, endDate?: string, filte
   };
 }
 
-async function generateMissionsReport(startDate?: string, endDate?: string, filters?: any) {
+async function generateMissionsReport(startDate?: string, endDate?: string) {
   const where: any = {};
   
   if (startDate && endDate) {
@@ -199,7 +199,7 @@ async function generateMissionsReport(startDate?: string, endDate?: string, filt
   };
 }
 
-async function generateInterventionsReport(startDate?: string, endDate?: string, filters?: any) {
+async function generateInterventionsReport(startDate?: string, endDate?: string) {
   const where: any = {};
   
   if (startDate && endDate) {
@@ -235,7 +235,7 @@ async function generateInterventionsReport(startDate?: string, endDate?: string,
   };
 }
 
-async function generateTechniciensReport(startDate?: string, endDate?: string, filters?: any) {
+async function generateTechniciensReport(startDate?: string, endDate?: string) {
   const techniciens = await prisma.technicien.findMany({
     include: {
       specialite: true,
@@ -311,3 +311,4 @@ async function generateDashboardReport() {
 }
 
 export { router as reportRouter };
+

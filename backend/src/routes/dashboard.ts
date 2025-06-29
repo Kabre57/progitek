@@ -16,7 +16,7 @@ router.use(authenticateToken);
  *     security:
  *       - bearerAuth: []
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     // Statistiques générales
     const [
@@ -153,3 +153,4 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 export { router as dashboardRouter };
+
