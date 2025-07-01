@@ -41,7 +41,7 @@ npm run dev
 - Design moderne avec logo ProgiTek
 - Formulaire avec validation
 - Gestion des erreurs
-- Identifiants par défaut : admin@example.com / admin123
+- Identifiants par défaut : theogoeffroy5@gmail.com / admin123
 
 ### 📊 **Dashboard**
 - Statistiques générales
@@ -137,7 +137,7 @@ L'interface est prête pour se connecter à l'API :
 
 1. **Démarrer le backend** : `cd backend && npm run dev`
 2. **Configurer l'URL** : `.env` → `VITE_API_BASE_URL`
-3. **Tester la connexion** : admin@example.com / admin123
+3. **Tester la connexion** : theogoeffroy5@gmail.com / admin123
 
 ## 🎉 **Résultat**
 

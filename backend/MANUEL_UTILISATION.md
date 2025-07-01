@@ -27,7 +27,7 @@ npm run dev
 ### 2. Vérification
 - **API** : http://localhost:3000/health
 - **Documentation** : http://localhost:3000/api-docs
-- **Connexion test** : admin@example.com / admin123
+- **Connexion test** : theogoeffroy5@gmail.com / admin123
 
 ## 🔐 Authentification
 
@@ -36,7 +36,7 @@ npm run dev
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@example.com",
+    "email": "theogoeffroy5@gmail.com",
     "motDePasse": "admin123"
   }'
 ```
@@ -51,7 +51,7 @@ curl -X POST http://localhost:3000/api/auth/login \
       "id": 1,
       "nom": "Admin",
       "prenom": "System",
-      "email": "admin@example.com",
+      "email": "theogoeffroy5@gmail.com",
       "role": { "libelle": "admin" }
     },
     "tokens": {

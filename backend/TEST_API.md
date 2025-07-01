@@ -38,7 +38,7 @@ Vous devriez voir :
 ### Méthode 1 : PowerShell (Windows)
 ```powershell
 $body = @{
-    email = "admin@example.com"
+    email = "theogoeffroy5@gmail.com"
     motDePasse = "admin123"
 } | ConvertTo-Json
 
@@ -57,13 +57,13 @@ Write-Host "Token: $token"
 # Connexion
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "motDePasse": "admin123"}' \
+  -d '{"email": "theogoeffroy5@gmail.com", "motDePasse": "admin123"}' \
   | jq '.'
 
 # Si vous n'avez pas jq, sans formatage :
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "motDePasse": "admin123"}'
+  -d '{"email": "theogoeffroy5@gmail.com", "motDePasse": "admin123"}'
 ```
 
 ### Méthode 3 : Navigateur (Console JavaScript)
@@ -77,7 +77,7 @@ async function testLogin() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'admin@example.com',
+        email: 'theogoeffroy5@gmail.com',
         motDePasse: 'admin123'
       })
     });
@@ -115,7 +115,7 @@ Si tout fonctionne, vous devriez recevoir :
       "id": 1,
       "nom": "Admin",
       "prenom": "System",
-      "email": "admin@example.com",
+      "email": "theogoeffroy5@gmail.com",
       "phone": "+225 01 02 03 04 05",
       "status": "active",
       "lastLogin": null,
@@ -242,7 +242,7 @@ curl -X GET http://localhost:3000/api/techniciens \
    - Body (raw JSON) :
    ```json
    {
-     "email": "admin@example.com",
+     "email": "theogoeffroy5@gmail.com",
      "motDePasse": "admin123"
    }
    ```

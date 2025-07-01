@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { config } from '../src/config/config';
 
 const prisma = new PrismaClient();
@@ -57,7 +57,7 @@ async function main() {
     data: {
       nom: 'Admin',
       prenom: 'System',
-      email: 'admin@example.com',
+      email: 'theogoeffroy5@gmail.com',
       motDePasse: adminPassword,
       phone: '+225 01 02 03 04 05',
       roleId: adminRole.id,

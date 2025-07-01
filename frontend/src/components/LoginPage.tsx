@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 export const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('admin@example.com');
+  const [email, setEmail] = useState('theogoeffroy5@gmail.com');
   const [motDePasse, setMotDePasse] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

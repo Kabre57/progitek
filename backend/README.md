@@ -115,7 +115,7 @@ Une fois l'API démarrée, accédez à :
 Après avoir exécuté `npm run db:seed`, vous aurez accès à :
 
 **Compte Administrateur :**
-- Email : `admin@example.com`
+- Email : `theogoeffroy5@gmail.com`
 - Mot de passe : `admin123`
 
 ## 📡 Endpoints principaux
@@ -160,7 +160,7 @@ GET  /api/interventions    # Liste interventions
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@example.com",
+    "email": "theogoeffroy5@gmail.com",
     "motDePasse": "admin123"
   }'
 ```

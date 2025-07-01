@@ -22,7 +22,7 @@ npm run dev
 
 - API : http://localhost:3000/health
 - Documentation : http://localhost:3000/api-docs
-- Connexion test : admin@example.com / admin123
+- Connexion test : theogoeffroy5@gmail.com / admin123
 
 ## 🧪 Test rapide
 
@@ -30,7 +30,7 @@ npm run dev
 # Tester la connexion
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "motDePasse": "admin123"}'
+  -d '{"email": "theogoeffroy5@gmail.com", "motDePasse": "admin123"}'
 ```
 
 ## 🔧 En cas de problème

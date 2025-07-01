@@ -79,7 +79,7 @@ import { useAuth } from './hooks/useAuth';
 const { user, login, logout, isAuthenticated, hasRole } = useAuth();
 
 // Connexion
-await login('admin@example.com', 'admin123');
+await login('theogoeffroy5@gmail.com', 'admin123');
 
 // Vérifier le rôle
 if (hasRole('admin')) {
@@ -279,7 +279,7 @@ apiClient.interceptors.request.use(request => {
 - **API Docs** : http://localhost:3000/api-docs
 
 ### Identifiants de test
-- **Email** : admin@example.com
+- **Email** : theogoeffroy5@gmail.com
 - **Mot de passe** : admin123
 
 ---

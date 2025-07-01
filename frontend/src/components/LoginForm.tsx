@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 export const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('admin@example.com');
+  const [email, setEmail] = useState('theogoeffroy5@gmail.com');
   const [motDePasse, setMotDePasse] = useState('admin123');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -91,7 +91,7 @@ export const LoginForm: React.FC = () => {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Compte de test : admin@example.com / admin123
+              Compte de test : theogoeffroy5@gmail.com / admin123
             </p>
           </div>
         </form>
