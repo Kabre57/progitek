@@ -4,11 +4,7 @@
   "description": "RESTful API backend with TypeScript, Express, and Supabase",
   "main": "dist/server.js",
   "private": true,
-<<<<<<< HEAD
-  "type": "module",
-=======
   "type": "commonjs",
->>>>>>> a4a7107588efdcfcfd124f9ba106901d691d6532
   "scripts": {
     "dev": "tsx watch src/server.js",
     "build": "tsc",
@@ -28,10 +24,6 @@
   "dependencies": {
     "@prisma/client": "^5.7.1",
     "@supabase/supabase-js": "^2.38.5",
-<<<<<<< HEAD
-    "bcrypt": "^6.0.0",
-=======
->>>>>>> a4a7107588efdcfcfd124f9ba106901d691d6532
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

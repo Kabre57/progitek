@@ -1,27 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-<<<<<<< HEAD
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    // "allowImportingTsExtensions": true, // <-- Comment out or set to false
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false, // <-- Should be false
-    "jsx": "react-jsx",
-    "outDir": "./dist", // <-- Should be present
-
-    /* Linting */
-=======
     "module": "CommonJS",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020"],
     "rootDir": "./src",
     "outDir": "./dist",
->>>>>>> a4a7107588efdcfcfd124f9ba106901d691d6532
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -32,10 +15,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-<<<<<<< HEAD
-    /* Path mapping */
-=======
->>>>>>> a4a7107588efdcfcfd124f9ba106901d691d6532
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
