@@ -12,10 +12,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0',
-<<<<<<< HEAD
     // Configuration proxy pour éviter les problèmes CORS en développement
-=======
->>>>>>> 12e798f (Ajout du workflow de déploiement automatique)
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
