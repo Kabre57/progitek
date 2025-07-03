@@ -1,0 +1,17 @@
+# Ignorer les fichiers de build Vite/React
+frontend/dist/
+
+# Ignorer les fichiers de log
+*.log
+
+# Ignorer les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers de déploiement
+deploy-report-*.log
+monitoring-report-*.log
+
+# Ignorer les dépendances si jamais elles sont poussées
+node_modules/
+
