@@ -21,10 +21,15 @@ coverage/
 .env.*
 !.env.example
 
+# Base de données
+**/prisma/dev.db
+
 # Build output
 dist/
 build/
 out/
+# Dossiers build
+**/dist
 
 # Vite
 .vite/
