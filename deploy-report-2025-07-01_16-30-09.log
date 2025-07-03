@@ -1,7 +1,0 @@
-?? [mar. 01 juil. 2025 16:30:09 UTC] Déploiement du projet Progitek System...
-?? Mise à jour du code source depuis Git...
-git@github.com: Permission denied (publickey).
-fatal: Could not read from remote repository.
-
-Please make sure you have the correct access rights
-and the repository exists.
