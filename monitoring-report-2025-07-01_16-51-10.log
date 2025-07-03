@@ -1,0 +1,10 @@
+[2025-07-01 16:51:10] ?? Démarrage monitoring Progitek System...
+[2025-07-01 16:51:10] ? CPU OK: 8%
+[2025-07-01 16:51:10] ? Mémoire libre faible: 129MB
+[2025-07-01 16:51:10] ? Disque OK: 27% utilisé
+[2025-07-01 16:51:10] ? Apache2 actif
+[2025-07-01 16:51:10] ? PM2 inactif ou absent
+[2025-07-01 16:51:10] ? Base SQLite présente (124K)
+[2025-07-01 16:51:10] ? API OK (200)
+[2025-07-01 16:51:10] ? Certificat SSL non trouvé à /etc/letsencrypt/live/progitek.com/fullchain.pem
+[2025-07-01 16:51:10] ?? Rapport généré: /var/www/progitek/monitoring-report-2025-07-01_16-51-10.log

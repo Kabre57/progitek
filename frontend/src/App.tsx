@@ -6,8 +6,9 @@ import { Layout } from './components/Layout';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { ClientsPage } from './pages/ClientsPage';
-import { TechniciansPage } from './pages/TechniciansPage';
+import { TechniciensPage } from './pages/TechniciensPage';
 import { MissionsPage } from './pages/MissionsPage';
+import { MissionDetailPage } from './pages/MissionDetailPage';
 import { InterventionsPage } from './pages/InterventionsPage';
 import { UsersPage } from './pages/UsersPage';
 import { RolesPage } from './pages/RolesPage';
@@ -18,6 +19,11 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { DevisPage } from './pages/DevisPage';
 import { FacturesPage } from './pages/FacturesPage';
+import { TechnicienDashboardPage } from './pages/TechnicienDashboardPage';
+import { MessagesPage } from './pages/MessagesPage';
+import { RapportsPage } from './pages/RapportsPage';
+import { RapportDetailPage } from './pages/RapportDetailPage';
+import { RapportFormPage } from './pages/RapportFormPage';
 
 function App() {
   return (
@@ -92,10 +98,10 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/technicians" element={
+          <Route path="/techniciens" element={
             <ProtectedRoute>
               <Layout>
-                <TechniciansPage />
+                <TechniciensPage />
               </Layout>
             </ProtectedRoute>
           } />
@@ -104,6 +110,14 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <MissionsPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/missions/:id" element={
+            <ProtectedRoute>
+              <Layout>
+                <MissionDetailPage />
               </Layout>
             </ProtectedRoute>
           } />
@@ -160,6 +174,54 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <SettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/technicien-dashboard/:id" element={
+            <ProtectedRoute>
+              <Layout>
+                <TechnicienDashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <Layout>
+                <MessagesPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/rapports" element={
+            <ProtectedRoute>
+              <Layout>
+                <RapportsPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/rapports/:id" element={
+            <ProtectedRoute>
+              <Layout>
+                <RapportDetailPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/rapports/new" element={
+            <ProtectedRoute>
+              <Layout>
+                <RapportFormPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/rapports/edit/:id" element={
+            <ProtectedRoute>
+              <Layout>
+                <RapportFormPage />
               </Layout>
             </ProtectedRoute>
           } />

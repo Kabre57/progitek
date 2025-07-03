@@ -100,7 +100,7 @@ npm run dev
 Tous les services sont prêts pour l'intégration :
 - `authService` - Authentification
 - `clientService` - Gestion clients
-- `technicianService` - Gestion techniciens
+- `technicienService` - Gestion techniciens
 - `missionService` - Gestion missions
 - `interventionService` - Gestion interventions
 

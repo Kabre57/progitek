@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Loader } from 'lucide-react';
+import { X, Save, Loader, Plus, Trash2 } from 'lucide-react';
 import { interventionService, CreateInterventionData } from '../../services/interventionService';
 import { missionService } from '../../services/missionService';
-import { technicianService } from '../../services/technicianService';
+import { technicienService } from '../../services/technicienService';
 import { Intervention, Mission, Technicien } from '../../types/api';
 import toast from 'react-hot-toast';
 
@@ -22,7 +22,8 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
     dateHeureFin: '',
     duree: undefined,
     missionId: 0,
-    technicienId: undefined
+    technicienId: undefined,
+    techniciens: []
   });
 
   useEffect(() => {
@@ -34,12 +35,26 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
 
   useEffect(() => {
     if (intervention) {
+      // Récupérer le technicien principal
+      const principalTechnicien = intervention.techniciens?.find(t => t.role === 'principal');
+      const technicienId = principalTechnicien?.id;
+      
+      // Récupérer les techniciens supplémentaires (sans le principal)
+      const additionalTechniciens = intervention.techniciens
+        ?.filter(t => t.id !== technicienId)
+        .map(t => ({
+          id: t.id,
+          role: t.role || 'assistant',
+          commentaire: t.commentaire
+        })) || [];
+
       setFormData({
         dateHeureDebut: intervention.dateHeureDebut ? new Date(intervention.dateHeureDebut).toISOString().slice(0, 16) : '',
         dateHeureFin: intervention.dateHeureFin ? new Date(intervention.dateHeureFin).toISOString().slice(0, 16) : '',
         duree: intervention.duree,
         missionId: intervention.missionId,
-        technicienId: intervention.technicienId
+        technicienId: technicienId,
+        techniciens: additionalTechniciens
       });
     } else {
       setFormData({
@@ -47,7 +62,8 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
         dateHeureFin: '',
         duree: undefined,
         missionId: 0,
-        technicienId: undefined
+        technicienId: undefined,
+        techniciens: []
       });
     }
   }, [intervention, isOpen]);
@@ -63,7 +79,7 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
 
   const loadTechniciens = async () => {
     try {
-      const response = await technicianService.getTechnicians(1, 100);
+      const response = await technicienService.getTechniciens(1, 100);
       setTechniciens(response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des techniciens:', error);
@@ -84,15 +100,44 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
     calculateDuration();
   }, [formData.dateHeureDebut, formData.dateHeureFin]);
 
+  const handleAddTechnicien = () => {
+    setFormData({
+      ...formData,
+      techniciens: [
+        ...(formData.techniciens || []),
+        { id: 0, role: 'assistant', commentaire: '' }
+      ]
+    });
+  };
+
+  const handleRemoveTechnicien = (index: number) => {
+    const updatedTechniciens = [...(formData.techniciens || [])];
+    updatedTechniciens.splice(index, 1);
+    setFormData({ ...formData, techniciens: updatedTechniciens });
+  };
+
+  const handleTechnicienChange = (index: number, field: string, value: any) => {
+    const updatedTechniciens = [...(formData.techniciens || [])];
+    updatedTechniciens[index] = {
+      ...updatedTechniciens[index],
+      [field]: value
+    };
+    setFormData({ ...formData, techniciens: updatedTechniciens });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Filtrer les techniciens valides (avec un ID valide)
+      const validTechniciens = formData.techniciens?.filter(t => t.id > 0) || [];
+      
       const dataToSend = {
         ...formData,
         dateHeureDebut: formData.dateHeureDebut ? new Date(formData.dateHeureDebut).toISOString() : undefined,
-        dateHeureFin: formData.dateHeureFin ? new Date(formData.dateHeureFin).toISOString() : undefined
+        dateHeureFin: formData.dateHeureFin ? new Date(formData.dateHeureFin).toISOString() : undefined,
+        techniciens: validTechniciens
       };
 
       if (intervention) {
@@ -150,7 +195,7 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Technicien
+              Technicien principal
             </label>
             <select
               value={formData.technicienId || ''}
@@ -164,6 +209,65 @@ export const InterventionModal: React.FC<InterventionModalProps> = ({ isOpen, on
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Techniciens supplémentaires */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Techniciens supplémentaires
+              </label>
+              <button
+                type="button"
+                onClick={handleAddTechnicien}
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter
+              </button>
+            </div>
+            
+            {formData.techniciens && formData.techniciens.length > 0 ? (
+              <div className="space-y-3">
+                {formData.techniciens.map((tech, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <select
+                      value={tech.id || ''}
+                      onChange={(e) => handleTechnicienChange(index, 'id', parseInt(e.target.value))}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Sélectionner un technicien...</option>
+                      {techniciens
+                        .filter(t => t.id !== formData.technicienId && 
+                                    !formData.techniciens?.some((tech, i) => i !== index && tech.id === t.id))
+                        .map((technicien) => (
+                          <option key={technicien.id} value={technicien.id}>
+                            {technicien.nom} {technicien.prenom} - {technicien.specialite?.libelle}
+                          </option>
+                        ))}
+                    </select>
+                    <select
+                      value={tech.role || 'assistant'}
+                      onChange={(e) => handleTechnicienChange(index, 'role', e.target.value)}
+                      className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="assistant">Assistant</option>
+                      <option value="expert">Expert</option>
+                      <option value="observateur">Observateur</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTechnicien(index)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">Aucun technicien supplémentaire</p>
+            )}
           </div>
 
           <div>

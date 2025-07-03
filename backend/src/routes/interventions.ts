@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { authenticateToken } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
-import { auditService } from '../services/auditService';
 import { ApiResponse, PaginatedResponse } from '../models';
-import { createInterventionSchema, updateInterventionSchema } from '../validations/intervention';
+import { createInterventionSchema, updateInterventionSchema, addTechnicienSchema } from '../validations/intervention';
+import { interventionController } from '../controllers/interventionController';
 
 const router = Router();
 router.use(authenticateToken);
@@ -19,8 +19,20 @@ router.use(authenticateToken);
  *     security:
  *       - bearerAuth: []
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', interventionController.getInterventions);
+
+/**
+ * @swagger
+ * /api/interventions/technicien/{technicienId}:
+ *   get:
+ *     summary: Récupérer les interventions d'un technicien
+ *     tags: [Interventions]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/technicien/:technicienId', async (req: Request, res: Response) => {
   try {
+    const technicienId = parseInt(req.params.technicienId);
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
@@ -29,30 +41,64 @@ router.get('/', async (req: Request, res: Response) => {
       prisma.intervention.findMany({
         skip,
         take: limit,
+        where: {
+          technicienInterventions: {
+            some: {
+              technicienId: technicienId
+            }
+          }
+        },
         include: {
           mission: {
-            select: { 
-              numIntervention: true, 
-              natureIntervention: true,
-              description: true,
+            include: { 
               client: { 
                 select: { nom: true, entreprise: true } 
               }
             },
           },
-          technicien: {
-            select: { nom: true, prenom: true, contact: true },
+          technicienInterventions: {
+            include: {
+              technicien: {
+                include: { 
+                  specialite: true
+                },
+              },
+            },
           },
         },
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.intervention.count(),
+      prisma.intervention.count({
+        where: {
+          technicienInterventions: {
+            some: {
+              technicienId: technicienId
+            }
+          }
+        }
+      }),
     ]);
+
+    const formattedInterventions = interventions.map(intervention => {
+      const principalTechnicien = intervention.technicienInterventions.find(ti => 
+        ti.role === 'principal'
+      )?.technicien || intervention.technicienInterventions[0]?.technicien;
+
+      return {
+        ...intervention,
+        technicien: principalTechnicien,
+        techniciens: intervention.technicienInterventions.map(ti => ({
+          ...ti.technicien,
+          role: ti.role,
+          commentaire: ti.commentaire
+        }))
+      };
+    });
 
     res.json({
       success: true,
-      message: 'Interventions récupérées avec succès',
-      data: interventions,
+      message: 'Interventions du technicien récupérées avec succès',
+      data: formattedInterventions,
       pagination: {
         page,
         limit,
@@ -61,9 +107,10 @@ router.get('/', async (req: Request, res: Response) => {
       },
     } as PaginatedResponse);
   } catch (error) {
+    console.error('Error fetching technicien interventions:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des interventions',
+      message: 'Erreur lors de la récupération des interventions du technicien',
     } as ApiResponse);
   }
 });
@@ -77,39 +124,7 @@ router.get('/', async (req: Request, res: Response) => {
  *     security:
  *       - bearerAuth: []
  */
-router.post('/', validateRequest(createInterventionSchema), async (req: Request, res: Response) => {
-  try {
-    const intervention = await prisma.intervention.create({
-      data: req.body,
-      include: {
-        mission: {
-          include: { client: true },
-        },
-        technicien: true,
-      },
-    });
-
-    await auditService.logAction({
-      userId: req.user!.id,
-      actionType: 'CREATE',
-      entityType: 'INTERVENTION',
-      entityId: intervention.id,
-      details: `Intervention créée pour la mission ${intervention.mission?.natureIntervention}`,
-      ipAddress: req.ip,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'Intervention créée avec succès',
-      data: intervention,
-    } as ApiResponse);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la création de l\'intervention',
-    } as ApiResponse);
-  }
-});
+router.post('/', validateRequest(createInterventionSchema), interventionController.createIntervention);
 
 /**
  * @swagger
@@ -120,41 +135,7 @@ router.post('/', validateRequest(createInterventionSchema), async (req: Request,
  *     security:
  *       - bearerAuth: []
  */
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const interventionId = parseInt(req.params.id);
-    
-    const intervention = await prisma.intervention.findUnique({
-      where: { id: interventionId },
-      include: {
-        mission: {
-          include: { client: true },
-        },
-        technicien: {
-          include: { specialite: true },
-        },
-      },
-    });
-
-    if (!intervention) {
-      return res.status(404).json({
-        success: false,
-        message: 'Intervention non trouvée',
-      } as ApiResponse);
-    }
-
-    res.json({
-      success: true,
-      message: 'Intervention récupérée avec succès',
-      data: intervention,
-    } as ApiResponse);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération de l\'intervention',
-    } as ApiResponse);
-  }
-});
+router.get('/:id', interventionController.getInterventionById);
 
 /**
  * @swagger
@@ -165,40 +146,29 @@ router.get('/:id', async (req: Request, res: Response) => {
  *     security:
  *       - bearerAuth: []
  */
-router.put('/:id', validateRequest(updateInterventionSchema), async (req: Request, res: Response) => {
-  try {
-    const interventionId = parseInt(req.params.id);
-    
-    const intervention = await prisma.intervention.update({
-      where: { id: interventionId },
-      data: req.body,
-      include: {
-        mission: true,
-        technicien: true,
-      },
-    });
+router.put('/:id', validateRequest(updateInterventionSchema), interventionController.updateIntervention);
 
-    await auditService.logAction({
-      userId: req.user!.id,
-      actionType: 'UPDATE',
-      entityType: 'INTERVENTION',
-      entityId: intervention.id,
-      details: `Intervention modifiée`,
-      ipAddress: req.ip,
-    });
+/**
+ * @swagger
+ * /api/interventions/{id}/techniciens:
+ *   post:
+ *     summary: Ajouter un technicien à une intervention
+ *     tags: [Interventions]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post('/:id/techniciens', validateRequest(addTechnicienSchema), interventionController.addTechnicien);
 
-    res.json({
-      success: true,
-      message: 'Intervention modifiée avec succès',
-      data: intervention,
-    } as ApiResponse);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la modification de l\'intervention',
-    } as ApiResponse);
-  }
-});
+/**
+ * @swagger
+ * /api/interventions/{id}/techniciens/{technicienId}:
+ *   delete:
+ *     summary: Retirer un technicien d'une intervention
+ *     tags: [Interventions]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.delete('/:id/techniciens/:technicienId', interventionController.removeTechnicien);
 
 /**
  * @swagger
@@ -209,33 +179,6 @@ router.put('/:id', validateRequest(updateInterventionSchema), async (req: Reques
  *     security:
  *       - bearerAuth: []
  */
-router.delete('/:id', async (req: Request, res: Response) => {
-  try {
-    const interventionId = parseInt(req.params.id);
-    
-    const intervention = await prisma.intervention.delete({
-      where: { id: interventionId },
-    });
-
-    await auditService.logAction({
-      userId: req.user!.id,
-      actionType: 'DELETE',
-      entityType: 'INTERVENTION',
-      entityId: intervention.id,
-      details: `Intervention supprimée`,
-      ipAddress: req.ip,
-    });
-
-    res.json({
-      success: true,
-      message: 'Intervention supprimée avec succès',
-    } as ApiResponse);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la suppression de l\'intervention',
-    } as ApiResponse);
-  }
-});
+router.delete('/:id', interventionController.deleteIntervention);
 
 export { router as interventionRouter };

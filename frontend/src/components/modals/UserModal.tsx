@@ -15,14 +15,16 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [roles, setRoles] = useState<any[]>([]);
-  const [formData, setFormData] = useState<CreateUserData & { id?: number }>({
-    nom: '',
-    prenom: '',
-    email: '',
-    motDePasse: '',
-    phone: '',
-    roleId: 2 // Default to user role
-  });
+  const [formData, setFormData] = useState<CreateUserData & { id?: number }>(
+    {
+      nom: '',
+      prenom: '',
+      email: '',
+      motDePasse: '',
+      phone: '',
+      roleId: 2 // Default to user role
+    }
+  );
 
   useEffect(() => {
     if (isOpen) {

@@ -344,9 +344,9 @@ export const clientService = new ClientService();
 
 ## 🔧 Service de Gestion des Techniciens
 
-### TechnicianService
+### TechnicienService
 ```typescript
-// src/services/technicianService.ts
+// src/services/technicienService.ts
 import { apiClient } from './api';
 
 export interface Technicien {
@@ -372,41 +372,41 @@ export interface Specialite {
   totalTechniciens?: number;
 }
 
-export interface CreateTechnicianData {
+export interface CreateTechnicienData {
   nom: string;
   prenom: string;
   contact?: string;
   specialiteId?: number;
 }
 
-class TechnicianService {
+class TechnicienService {
   // Lister les techniciens
-  async getTechnicians(page = 1, limit = 10): Promise<PaginatedResponse<Technicien>> {
-    const response = await apiClient.get(`/technicians?page=${page}&limit=${limit}`);
+  async getTechniciens(page = 1, limit = 10): Promise<PaginatedResponse<Technicien>> {
+    const response = await apiClient.get(`/techniciens?page=${page}&limit=${limit}`);
     return response.data;
   }
 
   // Créer un technicien
-  async createTechnician(technicianData: CreateTechnicianData): Promise<Technicien> {
-    const response = await apiClient.post('/technicians', technicianData);
+  async createTechnicien(TechnicienData: CreateTechnicienData): Promise<Technicien> {
+    const response = await apiClient.post('/techniciens', TechnicienData);
     return response.data.data;
   }
 
   // Récupérer un technicien par ID
-  async getTechnicianById(id: number): Promise<Technicien> {
-    const response = await apiClient.get(`/technicians/${id}`);
+  async getTechnicienById(id: number): Promise<Technicien> {
+    const response = await apiClient.get(`/techniciens/${id}`);
     return response.data.data;
   }
 
   // Modifier un technicien
-  async updateTechnician(id: number, technicianData: Partial<CreateTechnicianData>): Promise<Technicien> {
-    const response = await apiClient.put(`/technicians/${id}`, technicianData);
+  async updateTechnicien(id: number, TechnicienData: Partial<CreateTechnicienData>): Promise<Technicien> {
+    const response = await apiClient.put(`/techniciens/${id}`, TechnicienData);
     return response.data.data;
   }
 
   // Supprimer un technicien
-  async deleteTechnician(id: number): Promise<void> {
-    await apiClient.delete(`/technicians/${id}`);
+  async deleteTechnicien(id: number): Promise<void> {
+    await apiClient.delete(`/techniciens/${id}`);
   }
 
   // Récupérer les spécialités
@@ -416,7 +416,7 @@ class TechnicianService {
   }
 }
 
-export const technicianService = new TechnicianService();
+export const technicienService = new TechnicienService();
 ```
 
 ## 📊 Service Dashboard

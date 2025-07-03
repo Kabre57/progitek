@@ -21,7 +21,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { generateFacturePDF } from '../utils/generateFacturePDF';
+import { generateFacturePDF } from '../utils/pdfGenerator';
 
 export const FacturesPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -158,7 +158,7 @@ export const FacturesPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestion des factures</h1>
           <p className="text-gray-600">Suivez et gérez vos factures clients</p>
@@ -207,7 +207,7 @@ export const FacturesPage: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <select
             value={statutFilter}
             onChange={(e) => setStatutFilter(e.target.value)}
@@ -243,124 +243,127 @@ export const FacturesPage: React.FC = () => {
 
       {/* Table des factures */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-        <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Numéro
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Devis
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Montant TTC
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date émission
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Échéance
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!data?.data || data.data.length === 0 ? (
+        <div className="table-scrollable">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                  Aucune facture trouvée
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Numéro
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Devis
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Montant TTC
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date émission
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Échéance
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              data.data.map((facture) => (
-                <tr key={facture.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {facture.numero}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{facture.client?.nom}</div>
-                    <div className="text-sm text-gray-500">{facture.client?.entreprise}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{facture.devis?.numero}</div>
-                    <div className="text-sm text-gray-500">{facture.devis?.titre}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {facture.montantTTC.toLocaleString('fr-FR', { 
-                      style: 'currency', 
-                      currency: 'XOF' 
-                    })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutColor(facture.statut)}`}>
-                      {getStatutLabel(facture.statut)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(facture.dateEmission).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(facture.dateEcheance).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handlePrintFacture(facture)}
-                        className="text-gray-600 hover:text-gray-900"
-                        title="Imprimer"
-                      >
-                        <Printer className="h-4 w-4" />
-                      </button>
-                      
-                      <button
-                        onClick={() => window.open(`/factures/${facture.id}`, '_blank')}
-                        className="text-gray-600 hover:text-gray-900"
-                        title="Voir"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      
-                      {canSend(facture.statut) && (
-                        <button
-                          onClick={() => handleSend(facture.id)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Envoyer au client"
-                        >
-                          <Send className="h-4 w-4" />
-                        </button>
-                      )}
-                      
-                      {canPay(facture.statut) && (
-                        <button
-                          onClick={() => handlePay(facture.id)}
-                          className="text-green-600 hover:text-green-900"
-                          title="Marquer comme payée"
-                        >
-                          <CreditCard className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!data?.data || data.data.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                    Aucune facture trouvée
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                data.data.map((facture) => (
+                  <tr key={facture.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-label="Numéro">
+                      {facture.numero}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Client">
+                      <div className="text-sm text-gray-900">{facture.client?.nom}</div>
+                      <div className="text-sm text-gray-500">{facture.client?.entreprise}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Devis">
+                      <div className="text-sm text-gray-900">{facture.devis?.numero}</div>
+                      <div className="text-sm text-gray-500">{facture.devis?.titre}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-label="Montant TTC">
+                      {facture.montantTTC.toLocaleString('fr-FR', { 
+                        style: 'currency', 
+                        currency: 'XOF' 
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Statut">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutColor(facture.statut)}`}>
+                        {getStatutLabel(facture.statut)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-label="Date émission">
+                      {new Date(facture.dateEmission).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-label="Échéance">
+                      {new Date(facture.dateEcheance).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Actions">
+                      <div className="flex items-center space-x-2 flex-wrap gap-2">
+                        {/* Toujours disponible: Imprimer */}
+                        <button
+                          onClick={() => handlePrintFacture(facture)}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Imprimer"
+                        >
+                          <Printer className="h-4 w-4" />
+                        </button>
+                        
+                        {/* Toujours disponible: Voir */}
+                        <button
+                          onClick={() => window.open(`/factures/${facture.id}`, '_blank')}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Voir"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        
+                        {/* Conditionnels: Envoyer, Payer */}
+                        {canSend(facture.statut) && (
+                          <button
+                            onClick={() => handleSend(facture.id)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Envoyer au client"
+                          >
+                            <Send className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {canPay(facture.statut) && (
+                          <button
+                            onClick={() => handlePay(facture.id)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Marquer comme payée"
+                          >
+                            <CreditCard className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="text-sm text-gray-700">
             Affichage de {((data.pagination.page - 1) * data.pagination.limit) + 1} à{' '}
             {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} sur{' '}

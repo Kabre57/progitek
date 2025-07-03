@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { Header } from './Header';
 import toast from 'react-hot-toast';
 import { 
   Users, 
@@ -15,16 +16,35 @@ import {
   Shield,
   Award,
   LogOut,
-  Menu,
-  Search,
-  X
+  MessageSquare,
+  ClipboardList
 } from 'lucide-react';
+import { messageService } from '../services/messageService';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  // Récupérer le nombre de messages non lus
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await messageService.getUnreadCount();
+        setUnreadMessages(count);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des messages non lus:', error);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // Rafraîchir toutes les minutes
+    const interval = setInterval(fetchUnreadCount, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
@@ -32,12 +52,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { name: 'Rôles', href: '/roles', icon: Shield, adminOnly: true },
     { name: 'Spécialités', href: '/specialites', icon: Award, adminOnly: true },
     { name: 'Clients', href: '/clients', icon: UserCheck },
-    { name: 'Techniciens', href: '/technicians', icon: Settings },
+    { name: 'Techniciens', href: '/techniciens', icon: Settings },
     { name: 'Missions', href: '/missions', icon: Briefcase },
     { name: 'Interventions', href: '/interventions', icon: Settings },
     { name: 'Devis', href: '/devis', icon: FileText },
     { name: 'Factures', href: '/factures', icon: Receipt },
-    { name: 'Rapports', href: '/reports', icon: BarChart3 },
+    { name: 'Rapports', href: '/rapports', icon: ClipboardList },
+    { name: 'Messages', href: '/messages', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
+    { name: 'Statistiques', href: '/reports', icon: BarChart3 },
     { name: 'Audit', href: '/audit', icon: Eye, adminOnly: true },
     { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Paramètres', href: '/settings', icon: Settings },
@@ -68,7 +90,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               onClick={() => setSidebarOpen(false)}
             >
-              <X className="h-6 w-6 text-white" />
+              <span className="sr-only">Fermer le menu</span>
+              <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
@@ -96,6 +121,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   >
                     <Icon className="mr-4 h-6 w-6" />
                     {item.name}
+                    {item.badge && (
+                      <span className="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -158,6 +188,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     >
                       <Icon className="mr-3 h-5 w-5" />
                       {item.name}
+                      {item.badge && (
+                        <span className="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -176,43 +211,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
       </div>
 
-      {/* Contenu principal */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         {/* Header */}
-        <div className="relative z-0 flex-shrink-0 flex h-16 bg-white shadow">
-          <button
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-          
-          <div className="flex-1 px-4 flex justify-between">
-            {/* Barre de recherche */}
-            <div className="flex-1 flex">
-              <div className="w-full flex md:ml-0">
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5" />
-                  </div>
-                  <input
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Rechercher..."
-                    type="search"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Actions header */}
-            <div className="ml-4 flex items-center md:ml-6">
-              {/* Notifications */}
-              <Link to="/notifications" className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <Bell className="h-6 w-6" />
-              </Link>
-            </div>
-          </div>
-        </div>
+        <Header onSidebarToggle={() => setSidebarOpen(true)} />
 
         {/* Contenu de la page */}
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">

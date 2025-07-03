@@ -1,0 +1,8 @@
+?? [mar. 01 juil. 2025 16:29:19 UTC] Déploiement du projet Progitek System...
+?? Mise à jour du code source depuis Git...
+Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.

@@ -35,8 +35,12 @@ router.get('/', async (req: Request, res: Response) => {
           },
           interventions: {
             include: {
-              technicien: {
-                select: { nom: true, prenom: true },
+              technicienInterventions: {
+                include: {
+                  technicien: {
+                    select: { nom: true, prenom: true },
+                  },
+                },
               },
             },
           },
@@ -58,6 +62,7 @@ router.get('/', async (req: Request, res: Response) => {
       },
     } as PaginatedResponse);
   } catch (error) {
+    console.error('Error fetching missions:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des missions',
@@ -76,23 +81,6 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.post('/', validateRequest(createMissionSchema), async (req: Request, res: Response) => {
   try {
-    const { clientId, dateSortieFicheIntervention } = req.body;
-
-    const clientExists = await prisma.client.findUnique({
-      where: { id: clientId }
-    });
-
-    if (!clientExists) {
-      return res.status(400).json({
-        success: false,
-        message: "Client inexistant pour l'ID fourni"
-      });
-    }
-
-    if (dateSortieFicheIntervention) {
-      req.body.dateSortieFicheIntervention = new Date(dateSortieFicheIntervention);
-    }
-
     const mission = await prisma.mission.create({
       data: req.body,
       include: {
@@ -113,12 +101,13 @@ router.post('/', validateRequest(createMissionSchema), async (req: Request, res:
       success: true,
       message: 'Mission créée avec succès',
       data: mission,
-    });
+    } as ApiResponse);
   } catch (error) {
+    console.error('Error creating mission:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de la mission',
-    });
+    } as ApiResponse);
   }
 });
 
@@ -141,10 +130,22 @@ router.get('/:id', async (req: Request, res: Response) => {
         client: true,
         interventions: {
           include: {
-            technicien: {
-              include: { specialite: true },
+            technicienInterventions: {
+              include: {
+                technicien: {
+                  include: { specialite: true },
+                },
+              },
             },
           },
+        },
+        documents: {
+          include: {
+            createdBy: {
+              select: { id: true, nom: true, prenom: true },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
         },
       },
     });
@@ -162,6 +163,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       data: mission,
     } as ApiResponse);
   } catch (error) {
+    console.error('Error fetching mission:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération de la mission',
@@ -178,30 +180,13 @@ router.get('/:id', async (req: Request, res: Response) => {
  *     security:
  *       - bearerAuth: []
  */
-router.put("/:id", validateRequest(updateMissionSchema), async (req: Request, res: Response) => {
+router.put('/:id', validateRequest(updateMissionSchema), async (req: Request, res: Response) => {
   try {
     const missionId = parseInt(req.params.id);
-    const { dateSortieFicheIntervention, ...rest } = req.body;
-
-    const existingMission = await prisma.mission.findUnique({
-      where: { numIntervention: missionId },
-    });
-
-    if (!existingMission) {
-      return res.status(404).json({
-        success: false,
-        message: "Mission non trouvée.",
-      });
-    }
-
-    let dataToUpdate: any = { ...rest };
-    if (dateSortieFicheIntervention) {
-      dataToUpdate.dateSortieFicheIntervention = new Date(dateSortieFicheIntervention);
-    }
-
+    
     const mission = await prisma.mission.update({
       where: { numIntervention: missionId },
-      data: dataToUpdate,
+      data: req.body,
       include: {
         client: true,
       },
@@ -222,6 +207,7 @@ router.put("/:id", validateRequest(updateMissionSchema), async (req: Request, re
       data: mission,
     } as ApiResponse);
   } catch (error) {
+    console.error('Error updating mission:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la modification de la mission',
@@ -260,6 +246,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
       message: 'Mission supprimée avec succès',
     } as ApiResponse);
   } catch (error) {
+    console.error('Error deleting mission:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression de la mission',
@@ -268,4 +255,3 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 export { router as missionRouter };
-

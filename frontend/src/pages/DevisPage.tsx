@@ -241,7 +241,7 @@ export const DevisPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestion des devis</h1>
           <p className="text-gray-600">Créez et gérez vos devis avec validation DG</p>
@@ -297,7 +297,7 @@ export const DevisPage: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <select
             value={statutFilter}
             onChange={(e) => setStatutFilter(e.target.value)}
@@ -329,180 +329,183 @@ export const DevisPage: React.FC = () => {
 
       {/* Table des devis */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-        <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Numéro
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Titre
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Montant TTC
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date création
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!data?.data || data.data.length === 0 ? (
+        <div className="table-scrollable">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                  Aucun devis trouvé
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Numéro
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Titre
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Montant TTC
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date création
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              data.data.map((devis) => (
-                <tr key={devis.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {devis.numero}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{devis.titre}</div>
-                    {devis.description && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {devis.description}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{devis.client?.nom}</div>
-                    <div className="text-sm text-gray-500">{devis.client?.entreprise}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {devis.montantTTC.toLocaleString('fr-FR', { 
-                      style: 'currency', 
-                      currency: 'XOF' 
-                    })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutColor(devis.statut)}`}>
-                      {getStatutLabel(devis.statut)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(devis.dateCreation).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handlePrintDevis(devis)}
-                        className="text-gray-600 hover:text-gray-900"
-                        title="Imprimer"
-                      >
-                        <Printer className="h-4 w-4" />
-                      </button>
-                      
-                      <button
-                        onClick={() => window.open(`/devis/${devis.id}`, '_blank')}
-                        className="text-gray-600 hover:text-gray-900"
-                        title="Voir"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      
-                      {canEdit(devis.statut) && (
-                        <button
-                          onClick={() => handleEdit(devis)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Modifier"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                      )}
-                      
-                      {canSend(devis.statut) && (
-                        <button
-                          onClick={() => handleSend(devis.id)}
-                          className="text-green-600 hover:text-green-900"
-                          title="Envoyer pour validation DG"
-                        >
-                          <Send className="h-4 w-4" />
-                        </button>
-                      )}
-                      
-                      {canValidate(devis.statut) && (
-                        <>
-                          <button
-                            onClick={() => handleValidate(devis.id, 'valide_dg')}
-                            className="text-green-600 hover:text-green-900"
-                            title="Valider"
-                          >
-                            <Check className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleValidate(devis.id, 'refuse_dg')}
-                            className="text-red-600 hover:text-red-900"
-                            title="Refuser"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </>
-                      )}
-                      
-                      {canClientRespond(devis.statut) && (
-                        <>
-                          <button
-                            onClick={() => handleClientResponse(devis.id, 'accepte_client')}
-                            className="text-green-600 hover:text-green-900"
-                            title="Accepter (client)"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleClientResponse(devis.id, 'refuse_client')}
-                            className="text-red-600 hover:text-red-900"
-                            title="Refuser (client)"
-                          >
-                            <XCircle className="h-4 w-4" />
-                          </button>
-                        </>
-                      )}
-                      
-                      {canCreateFacture(devis.statut) && !devis.factureId && (
-                        <button
-                          onClick={() => handleCreateFacture(devis.id)}
-                          className="text-purple-600 hover:text-purple-900"
-                          title="Créer facture"
-                        >
-                          <Receipt className="h-4 w-4" />
-                        </button>
-                      )}
-                      
-                      {canDelete(devis.statut) && (
-                        <button
-                          onClick={() => handleDelete(devis.id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!data?.data || data.data.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    Aucun devis trouvé
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                data.data.map((devis) => (
+                  <tr key={devis.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-label="Numéro">
+                      {devis.numero}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Titre">
+                      <div className="text-sm font-medium text-gray-900">{devis.titre}</div>
+                      {devis.description && (
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {devis.description}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Client">
+                      <div className="text-sm text-gray-900">{devis.client?.nom}</div>
+                      <div className="text-sm text-gray-500">{devis.client?.entreprise}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-label="Montant TTC">
+                      {devis.montantTTC.toLocaleString('fr-FR', { 
+                        style: 'currency', 
+                        currency: 'XOF' 
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Statut">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutColor(devis.statut)}`}>
+                        {getStatutLabel(devis.statut)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-label="Date création">
+                      {new Date(devis.dateCreation).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Actions">
+                      <div className="flex items-center space-x-2 flex-wrap gap-2">
+                        {/* Toujours disponible: Imprimer */}
+                        <button
+                          onClick={() => handlePrintDevis(devis)}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Imprimer"
+                        >
+                          <Printer className="h-4 w-4" />
+                        </button>
+                        
+                        {/* Toujours disponible: Voir */}
+                        <button
+                          onClick={() => window.open(`/devis/${devis.id}`, '_blank')}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Voir"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        
+                        {/* Conditionnels: Éditer, Envoyer, Valider/Refuser, Accepter/Refuser, Facturer, Supprimer */}
+                        {canEdit(devis.statut) && (
+                          <button
+                            onClick={() => handleEdit(devis)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Modifier"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {canSend(devis.statut) && (
+                          <button
+                            onClick={() => handleSend(devis.id)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Envoyer pour validation DG"
+                          >
+                            <Send className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {canValidate(devis.statut) && (
+                          <>
+                            <button
+                              onClick={() => handleValidate(devis.id, 'valide_dg')}
+                              className="text-green-600 hover:text-green-900"
+                              title="Valider"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleValidate(devis.id, 'refuse_dg')}
+                              className="text-red-600 hover:text-red-900"
+                              title="Refuser"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
+                        
+                        {canClientRespond(devis.statut) && (
+                          <>
+                            <button
+                              onClick={() => handleClientResponse(devis.id, 'accepte_client')}
+                              className="text-green-600 hover:text-green-900"
+                              title="Accepter (client)"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleClientResponse(devis.id, 'refuse_client')}
+                              className="text-red-600 hover:text-red-900"
+                              title="Refuser (client)"
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
+                        
+                        {canCreateFacture(devis.statut) && !devis.factureId && (
+                          <button
+                            onClick={() => handleCreateFacture(devis.id)}
+                            className="text-purple-600 hover:text-purple-900"
+                            title="Créer facture"
+                          >
+                            <Receipt className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {canDelete(devis.statut) && (
+                          <button
+                            onClick={() => handleDelete(devis.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="text-sm text-gray-700">
             Affichage de {((data.pagination.page - 1) * data.pagination.limit) + 1} à{' '}
             {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} sur{' '}

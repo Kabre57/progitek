@@ -207,7 +207,6 @@ export const UsersPage: React.FC = () => {
 
       {/* Table des utilisateurs */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -316,7 +315,6 @@ export const UsersPage: React.FC = () => {
             )}
           </tbody>
         </table>
-        </div>
       </div>
 
       {/* Pagination */}

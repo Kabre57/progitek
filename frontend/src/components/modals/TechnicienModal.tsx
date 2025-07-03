@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader } from 'lucide-react';
-import { technicianService, CreateTechnicianData } from '../../services/technicianService';
-import { Technicien, Specialite } from '../../types/api';
+import { technicienService, CreateTechnicienData } from '../../services/technicienService';
+import { userService } from '../../services/userService';
+import { Technicien, User } from '../../types/api';
 import toast from 'react-hot-toast';
 
-interface TechnicianModalProps {
+interface technicienModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   technicien?: Technicien | null;
 }
 
-export const TechnicianModal: React.FC<TechnicianModalProps> = ({ isOpen, onClose, onSuccess, technicien }) => {
+export const TechnicienModal: React.FC<technicienModalProps> = ({ isOpen, onClose, onSuccess, technicien }) => {
   const [loading, setLoading] = useState(false);
-  const [specialites, setSpecialites] = useState<Specialite[]>([]);
-  const [formData, setFormData] = useState<CreateTechnicianData>({
+  const [specialites, setSpecialites] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [formData, setFormData] = useState<CreateTechnicienData>({
     nom: '',
     prenom: '',
     contact: '',
-    specialiteId: undefined
+    specialiteId: undefined,
+    utilisateurId: undefined
   });
 
   useEffect(() => {
     if (isOpen) {
       loadSpecialites();
+      loadUsers();
     }
   }, [isOpen]);
 
@@ -33,24 +37,35 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({ isOpen, onClos
         nom: technicien.nom,
         prenom: technicien.prenom,
         contact: technicien.contact || '',
-        specialiteId: technicien.specialiteId
+        specialiteId: technicien.specialiteId,
+        utilisateurId: technicien.utilisateurId
       });
     } else {
       setFormData({
         nom: '',
         prenom: '',
         contact: '',
-        specialiteId: undefined
+        specialiteId: undefined,
+        utilisateurId: undefined
       });
     }
   }, [technicien, isOpen]);
 
   const loadSpecialites = async () => {
     try {
-      const data = await technicianService.getSpecialites();
+      const data = await technicienService.getSpecialites();
       setSpecialites(data);
     } catch (error) {
       console.error('Erreur lors du chargement des spécialités:', error);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      const response = await userService.getUsers(1, 100);
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des utilisateurs:', error);
     }
   };
 
@@ -60,10 +75,10 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({ isOpen, onClos
 
     try {
       if (technicien) {
-        await technicianService.updateTechnician(technicien.id, formData);
+        await technicienService.updateTechnicien(technicien.id, formData);
         toast.success('Technicien modifié avec succès');
       } else {
-        await technicianService.createTechnician(formData);
+        await technicienService.createTechnicien(formData);
         toast.success('Technicien créé avec succès');
       }
       onSuccess();
@@ -147,6 +162,27 @@ export const TechnicianModal: React.FC<TechnicianModalProps> = ({ isOpen, onClos
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Compte utilisateur associé
+            </label>
+            <select
+              value={formData.utilisateurId || ''}
+              onChange={(e) => setFormData({ ...formData, utilisateurId: e.target.value ? parseInt(e.target.value) : undefined })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Aucun compte associé</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.nom} {user.prenom} ({user.email})
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Associer un compte utilisateur permettra au technicien de se connecter et d'accéder à son dashboard.
+            </p>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

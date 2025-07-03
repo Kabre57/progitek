@@ -8,7 +8,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import path from 'path';
 import fs from 'fs';
 
-import { config } from './config/config'; 
+import { config } from './config/config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 
@@ -16,7 +16,7 @@ import { notFoundHandler } from './middleware/notFoundHandler';
 import { authRouter } from './routes/auth';
 import { userRouter } from './routes/users';
 import { clientRouter } from './routes/clients';
-import { technicianRouter } from './routes/technicians';
+import { technicienRouter } from './routes/techniciens';
 import { missionRouter } from './routes/missions';
 import { interventionRouter } from './routes/interventions';
 import { reportRouter } from './routes/reports';
@@ -27,9 +27,12 @@ import { specialiteRouter } from './routes/specialites';
 import { roleRouter } from './routes/roles';
 import { devisRouter } from './routes/devis';
 import { factureRouter } from './routes/factures';
+import { documentRouter } from './routes/documents';
+import { messageRouter } from './routes/messages';
+import { rapportRouter } from './routes/rapports';
 
 const app = express();
-const PORT = config.server.port || 3000;
+const PORT = config.server.port || 3001;
 
 // Create logs directory if it doesn't exist
 const logsDir = path.dirname(config.logging.file);
@@ -39,9 +42,15 @@ if (!fs.existsSync(logsDir)) {
 
 // CORS Configuration - CORRECTION DU PROBLÈME
 const corsOptions = {
-  origin: ['http://localhost:5173',
-          'http://localhost:5174'], // Allow frontend origins
-  credentials: false, // Changed from true to false to fix CORS issues
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://192.168.1.85:5173',        // accès local si nécessaire
+    'http://100.127.74.69:5173',        // ← ✅ IP Tailscale de ton frontend à la maison
+    'http://ton-frontend.com',         // ← optionnel si tu as un domaine
+    'http://frontend.taile0fd44.ts.net' // ← si tu accèdes via nom Tailscale
+  ],
+  credentials: true, // ✅ très important si tu utilises un token JWT ou des cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
     'Origin',
@@ -53,10 +62,11 @@ const corsOptions = {
     'Pragma'
   ],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  maxAge: 86400, // 24 heures
+  maxAge: 86400,
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
+
 
 // Rate limiting
 const limiter = rateLimit({
@@ -75,11 +85,11 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'ParabellumGroups System API',
+      title: 'Progitek System API',
       version: '1.0.0',
       description: 'API RESTful complète pour la gestion technique avec TypeScript, Express et Prisma',
       contact: {
-        name: 'ParabellumGroups System',
+        name: 'Progitek System',
         email: config.email.fromEmail,
       },
     },
@@ -134,11 +144,11 @@ app.use(limiter);
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'ParabellumGroups System API Documentation',
+  customSiteTitle: 'Progitek System API Documentation',
 }));
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     message: 'Serveur en fonctionnement',
@@ -149,9 +159,9 @@ app.get('/health', (_req, res) => {
 });
 
 // API info endpoint
-app.get('/api/info', (_req, res) => {
+app.get('/api/info', (req, res) => {
   res.json({
-    name: 'ParabellumGroups System API',
+    name: 'Progitek System API',
     version: '1.0.0',
     description: 'API RESTful pour la gestion technique',
     environment: config.server.nodeEnv,
@@ -163,7 +173,7 @@ app.get('/api/info', (_req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/clients', clientRouter);
-app.use('/api/technicians', technicianRouter);
+app.use('/api/techniciens', technicienRouter);
 app.use('/api/missions', missionRouter);
 app.use('/api/interventions', interventionRouter);
 app.use('/api/reports', reportRouter);
@@ -174,9 +184,12 @@ app.use('/api/specialites', specialiteRouter);
 app.use('/api/roles', roleRouter);
 app.use('/api/devis', devisRouter);
 app.use('/api/factures', factureRouter);
+app.use('/api/documents', documentRouter);
+app.use('/api/messages', messageRouter);
+app.use('/api/rapports', rapportRouter);
 
 // Legacy routes (for backward compatibility)
-app.use('/api/techniciens', technicianRouter);
+app.use('/api/techniciens', technicienRouter);
 
 // Error handling middleware
 app.use(notFoundHandler);
@@ -194,9 +207,9 @@ process.on('SIGINT', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log('🚀 ================================');
-  console.log(`🚀 ParabellumGroups System API démarré`);
+  console.log(`🚀 Progitek System API démarré`);
   console.log(`🚀 Port: ${PORT}`);
   console.log(`🚀 Environnement: ${config.server.nodeEnv}`);
   console.log(`🚀 Documentation: http://localhost:${PORT}/api-docs`);
@@ -206,4 +219,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
-

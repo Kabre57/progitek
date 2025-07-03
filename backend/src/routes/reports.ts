@@ -18,7 +18,7 @@ router.use(authenticateToken);
  *     security:
  *       - bearerAuth: []
  */
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const reports = await prisma.report.findMany({
       include: {
@@ -62,13 +62,13 @@ router.post('/generate', validateRequest(generateReportSchema), async (req: Requ
         reportData = await generateClientsReport(startDate, endDate, filters);
         break;
       case 'missions':
-        reportData = await generateMissionsReport(startDate, endDate);
+        reportData = await generateMissionsReport(startDate, endDate, filters);
         break;
       case 'interventions':
-        reportData = await generateInterventionsReport(startDate, endDate);
+        reportData = await generateInterventionsReport(startDate, endDate, filters);
         break;
       case 'techniciens':
-        reportData = await generateTechniciensReport(startDate, endDate);
+        reportData = await generateTechniciensReport(startDate, endDate, filters);
         break;
       default:
         return res.status(400).json({
@@ -109,7 +109,7 @@ router.post('/generate', validateRequest(generateReportSchema), async (req: Requ
  *     security:
  *       - bearerAuth: []
  */
-router.get('/dashboard', async (_req: Request, res: Response) => {
+router.get('/dashboard', async (req: Request, res: Response) => {
   try {
     const dashboardData = await generateDashboardReport();
 
@@ -166,7 +166,7 @@ async function generateClientsReport(startDate?: string, endDate?: string, filte
   };
 }
 
-async function generateMissionsReport(startDate?: string, endDate?: string) {
+async function generateMissionsReport(startDate?: string, endDate?: string, filters?: any) {
   const where: any = {};
   
   if (startDate && endDate) {
@@ -182,8 +182,12 @@ async function generateMissionsReport(startDate?: string, endDate?: string) {
       client: true,
       interventions: {
         include: {
-          technicien: true,
-        },
+          technicienInterventions: {
+            include: {
+              technicien: true
+            }
+          }
+        }
       },
     },
   });
@@ -199,7 +203,7 @@ async function generateMissionsReport(startDate?: string, endDate?: string) {
   };
 }
 
-async function generateInterventionsReport(startDate?: string, endDate?: string) {
+async function generateInterventionsReport(startDate?: string, endDate?: string, filters?: any) {
   const where: any = {};
   
   if (startDate && endDate) {
@@ -215,8 +219,12 @@ async function generateInterventionsReport(startDate?: string, endDate?: string)
       mission: {
         include: { client: true },
       },
-      technicien: {
-        include: { specialite: true },
+      technicienInterventions: {
+        include: {
+          technicien: {
+            include: { specialite: true }
+          }
+        }
       },
     },
   });
@@ -224,22 +232,23 @@ async function generateInterventionsReport(startDate?: string, endDate?: string)
   return {
     totalInterventions: interventions.length,
     interventionsParTechnicien: interventions.reduce((acc, intervention) => {
-      const technicienNom = intervention.technicien ? 
-        `${intervention.technicien.nom} ${intervention.technicien.prenom}` : 
+      const technicien = intervention.technicienInterventions[0]?.technicien;
+      const technicienNom = technicien ? 
+        `${technicien.nom} ${technicien.prenom}` : 
         'Non assigné';
       acc[technicienNom] = (acc[technicienNom] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
-    dureeTotal: interventions.reduce((sum, intervention) => sum + (intervention.duree || 0), 0),
+    dureeTotal: interventions.reduce((sum: number, intervention) => sum + (intervention.duree || 0), 0),
     interventions,
   };
 }
 
-async function generateTechniciensReport(startDate?: string, endDate?: string) {
+async function generateTechniciensReport(startDate?: string, endDate?: string, filters?: any) {
   const techniciens = await prisma.technicien.findMany({
     include: {
       specialite: true,
-      interventions: {
+      technicienInterventions: {
         where: startDate && endDate ? {
           createdAt: {
             gte: new Date(startDate),
@@ -247,9 +256,13 @@ async function generateTechniciensReport(startDate?: string, endDate?: string) {
           },
         } : undefined,
         include: {
-          mission: {
-            include: { client: true },
-          },
+          intervention: {
+            include: {
+              mission: {
+                include: { client: true }
+              }
+            }
+          }
         },
       },
     },
@@ -264,8 +277,11 @@ async function generateTechniciensReport(startDate?: string, endDate?: string) {
     }, {} as Record<string, number>),
     techniciens: techniciens.map(technicien => ({
       ...technicien,
-      totalInterventions: technicien.interventions.length,
-      dureeTotal: technicien.interventions.reduce((sum, intervention) => sum + (intervention.duree || 0), 0),
+      totalInterventions: technicien.technicienInterventions.length,
+      dureeTotal: technicien.technicienInterventions.reduce(
+        (sum: number, ti) => sum + (ti.intervention.duree || 0), 
+        0
+      ),
     })),
   };
 }
@@ -293,7 +309,11 @@ async function generateDashboardReport() {
       orderBy: { createdAt: 'desc' },
       include: {
         mission: { include: { client: true } },
-        technicien: true,
+        technicienInterventions: {
+          include: {
+            technicien: true
+          }
+        }
       },
     }),
   ]);
@@ -306,9 +326,11 @@ async function generateDashboardReport() {
       totalInterventions,
     },
     recentMissions,
-    recentInterventions,
+    recentInterventions: recentInterventions.map(intervention => ({
+      ...intervention,
+      technicien: intervention.technicienInterventions[0]?.technicien
+    })),
   };
 }
 
 export { router as reportRouter };
-

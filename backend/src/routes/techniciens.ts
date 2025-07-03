@@ -5,20 +5,11 @@ import { authenticateToken } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { auditService } from '../services/auditService';
 import { ApiResponse, PaginatedResponse } from '../models';
-import { createTechnicianSchema, updateTechnicianSchema } from '../validations/technician';
+import { createTechnicienSchema, updateTechnicienSchema } from '../validations/technicien';
 
 const router = Router();
 router.use(authenticateToken);
 
-/**
- * @swagger
- * /api/technicians:
- *   get:
- *     summary: Récupérer la liste des techniciens
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
 router.get('/', async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -33,7 +24,7 @@ router.get('/', async (req: Request, res: Response) => {
           specialite: {
             select: { libelle: true, description: true },
           },
-          interventions: {
+          technicienInterventions: {
             select: { id: true },
           },
         },
@@ -44,7 +35,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     const techniciensWithStats = techniciens.map(technicien => ({
       ...technicien,
-      totalInterventions: technicien.interventions.length,
+      totalInterventions: technicien.technicienInterventions.length,
     }));
 
     res.json({
@@ -66,16 +57,7 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @swagger
- * /api/technicians:
- *   post:
- *     summary: Créer un nouveau technicien
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
-router.post('/', validateRequest(createTechnicianSchema), async (req: Request, res: Response) => {
+router.post('/', validateRequest(createTechnicienSchema), async (req: Request, res: Response) => {
   try {
     const technicien = await prisma.technicien.create({
       data: req.body,
@@ -106,15 +88,6 @@ router.post('/', validateRequest(createTechnicianSchema), async (req: Request, r
   }
 });
 
-/**
- * @swagger
- * /api/technicians/{id}:
- *   get:
- *     summary: Récupérer un technicien par ID
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const technicienId = parseInt(req.params.id);
@@ -123,10 +96,14 @@ router.get('/:id', async (req: Request, res: Response) => {
       where: { id: technicienId },
       include: {
         specialite: true,
-        interventions: {
+        technicienInterventions: {
           include: {
-            mission: {
-              include: { client: true },
+            intervention: {
+              include: {
+                mission: {
+                  include: { client: true },
+                },
+              },
             },
           },
         },
@@ -153,16 +130,7 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @swagger
- * /api/technicians/{id}:
- *   put:
- *     summary: Modifier un technicien
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
-router.put('/:id', validateRequest(updateTechnicianSchema), async (req: Request, res: Response) => {
+router.put('/:id', validateRequest(updateTechnicienSchema), async (req: Request, res: Response) => {
   try {
     const technicienId = parseInt(req.params.id);
     
@@ -196,15 +164,6 @@ router.put('/:id', validateRequest(updateTechnicianSchema), async (req: Request,
   }
 });
 
-/**
- * @swagger
- * /api/technicians/{id}:
- *   delete:
- *     summary: Supprimer un technicien
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const technicienId = parseInt(req.params.id);
@@ -234,16 +193,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @swagger
- * /api/technicians/specialites:
- *   get:
- *     summary: Récupérer la liste des spécialités
- *     tags: [Technicians]
- *     security:
- *       - bearerAuth: []
- */
-router.get('/specialites', async (_req: Request, res: Response) => {
+router.get('/specialites', async (req: Request, res: Response) => {
   try {
     const specialites = await prisma.specialite.findMany({
       include: {
@@ -272,5 +222,4 @@ router.get('/specialites', async (_req: Request, res: Response) => {
   }
 });
 
-export { router as technicianRouter };
-
+export { router as technicienRouter };

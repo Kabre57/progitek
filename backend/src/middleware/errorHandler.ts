@@ -2,27 +2,27 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiResponse } from '../models';
 
 export const errorHandler = (
-  error: any,
+  _error: any, // <-- renommé pour indiquer qu'il n'est pas lu (optionnel)
   _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  console.error('Error:', error);
+  console.error('Error:', _error);
 
   // Erreur de validation Prisma
-  if (error.code === 'P2002') {
+  if (_error.code === 'P2002') {
     return res.status(409).json({
       success: false,
       message: 'Cette ressource existe déjà',
       errors: [{
-        field: error.meta?.target?.[0] || 'unknown',
+        field: _error.meta?.target?.[0] || 'unknown',
         message: 'Valeur déjà utilisée'
       }]
     } as ApiResponse);
   }
 
   // Erreur de contrainte de clé étrangère
-  if (error.code === 'P2003') {
+  if (_error.code === 'P2003') {
     return res.status(400).json({
       success: false,
       message: 'Référence invalide',
@@ -30,11 +30,11 @@ export const errorHandler = (
   }
 
   // Erreur de validation Zod
-  if (error.name === 'ZodError') {
+  if (_error.name === 'ZodError') {
     return res.status(400).json({
       success: false,
       message: 'Données invalides',
-      errors: error.errors.map((err: any) => ({
+      errors: _error.errors.map((err: any) => ({
         field: err.path.join('.'),
         message: err.message
       }))
@@ -42,7 +42,7 @@ export const errorHandler = (
   }
 
   // Erreur JWT
-  if (error.name === 'JsonWebTokenError') {
+  if (_error.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
       message: 'Token invalide',
@@ -55,4 +55,3 @@ export const errorHandler = (
     message: 'Erreur interne du serveur',
   } as ApiResponse);
 };
-

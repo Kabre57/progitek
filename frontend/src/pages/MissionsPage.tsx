@@ -16,9 +16,11 @@ import {
   AlertCircle, 
   Clock,
   Calendar,
-  Building
+  Building,
+  Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const MissionsPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -27,6 +29,7 @@ export const MissionsPage: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [selectedMission, setSelectedMission] = useState(null);
+  const navigate = useNavigate();
 
   const { data, loading, error, refetch } = useApi(
     () => missionService.getMissions(page, 10),
@@ -48,6 +51,10 @@ export const MissionsPage: React.FC = () => {
   const handleEdit = (mission: any) => {
     setSelectedMission(mission);
     setShowEditModal(true);
+  };
+
+  const handleViewDetails = (missionId: number) => {
+    navigate(`/missions/${missionId}`);
   };
 
   const handleModalClose = () => {
@@ -130,7 +137,7 @@ export const MissionsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestion des missions</h1>
           <p className="text-gray-600">Planifiez et suivez vos missions d'intervention</p>
@@ -186,7 +193,7 @@ export const MissionsPage: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <button 
             onClick={() => setShowFilterPanel(true)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -204,112 +211,119 @@ export const MissionsPage: React.FC = () => {
 
       {/* Table des missions */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                N° Mission
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nature
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date prévue
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!data?.data || data.data.length === 0 ? (
+        <div className="table-scrollable">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                  Aucune mission trouvée
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  N° Mission
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Nature
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date prévue
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              data.data.map((mission) => (
-                <tr key={mission.numIntervention} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    #{mission.numIntervention}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {mission.natureIntervention}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {mission.objectifDuContrat?.substring(0, 30)}
-                      {mission.objectifDuContrat && mission.objectifDuContrat.length > 30 ? '...' : ''}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                        <Building className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {mission.client?.nom || `Client #${mission.clientId}`}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {mission.client?.entreprise || ''}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-900">
-                        {mission.dateSortieFicheIntervention 
-                          ? new Date(mission.dateSortieFicheIntervention).toLocaleDateString('fr-FR')
-                          : '-'
-                        }
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 max-w-xs truncate">
-                      {mission.description || '-'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button 
-                        onClick={() => handleEdit(mission)}
-                        className="text-blue-600 hover:text-blue-900" 
-                        title="Modifier"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(mission.numIntervention)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!data?.data || data.data.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    Aucune mission trouvée
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                data.data.map((mission) => (
+                  <tr key={mission.numIntervention} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-label="N° Mission">
+                      #{mission.numIntervention}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Nature">
+                      <div className="text-sm font-medium text-gray-900">
+                        {mission.natureIntervention}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {mission.objectifDuContrat?.substring(0, 30)}
+                        {mission.objectifDuContrat && mission.objectifDuContrat.length > 30 ? '...' : ''}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Client">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                          <Building className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {mission.client?.nom || `Client #${mission.clientId}`}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {mission.client?.entreprise || ''}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Date prévue">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="text-sm text-gray-900">
+                          {mission.dateSortieFicheIntervention 
+                            ? new Date(mission.dateSortieFicheIntervention).toLocaleDateString('fr-FR')
+                            : '-'
+                          }
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4" data-label="Description">
+                      <div className="text-sm text-gray-900 max-w-xs truncate">
+                        {mission.description || '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Actions">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleViewDetails(mission.numIntervention)}
+                          className="text-gray-600 hover:text-gray-900" 
+                          title="Voir détails"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleEdit(mission)}
+                          className="text-blue-600 hover:text-blue-900" 
+                          title="Modifier"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(mission.numIntervention)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="text-sm text-gray-700">
             Affichage de {((data.pagination.page - 1) * data.pagination.limit) + 1} à{' '}
             {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} sur{' '}

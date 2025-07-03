@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { prisma } from '../config/database';
 import { config } from '../config/config';
 import { auditService } from '../services/auditService';
 import { ApiResponse } from '../models';
 
-const jwtSecret: Secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
-const jwtRefreshSecret: Secret = process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-in-production';
-
 export const authController = {
+  // Connexion
   async login(req: Request, res: Response) {
     try {
       const { email, motDePasse } = req.body;
@@ -19,19 +17,30 @@ export const authController = {
         include: { role: true },
       });
 
-      if (!user || !(await bcrypt.compare(motDePasse, user.motDePasse))) {
-        return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect' } as ApiResponse);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Email ou mot de passe incorrect',
+        } as ApiResponse);
+      }
+
+      const isPasswordValid = await bcrypt.compare(motDePasse, user.motDePasse);
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          message: 'Email ou mot de passe incorrect',
+        } as ApiResponse);
       }
 
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
-        jwtSecret,
+        config.jwt.secret,
         { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       const refreshToken = jwt.sign(
         { id: user.id },
-        jwtRefreshSecret,
+        config.jwt.refreshSecret,
         { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
       );
 
@@ -76,14 +85,24 @@ export const authController = {
       res.json({
         success: true,
         message: 'Connexion réussie',
-        data: { user: userResponse, tokens: { accessToken, refreshToken } },
+        data: {
+          user: userResponse,
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
+        },
       } as ApiResponse);
     } catch (error) {
       console.error('Login error:', error);
-      res.status(500).json({ success: false, message: 'Erreur lors de la connexion' } as ApiResponse);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur lors de la connexion',
+      } as ApiResponse);
     }
   },
 
+  // Inscription
   async register(req: Request, res: Response) {
     try {
       const { nom, prenom, email, motDePasse, phone, roleId } = req.body;
@@ -121,13 +140,13 @@ export const authController = {
 
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
-        jwtSecret,
+        config.jwt.secret,
         { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       const refreshToken = jwt.sign(
         { id: user.id },
-        jwtRefreshSecret,
+        config.jwt.refreshSecret,
         { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
       );
 
@@ -157,14 +176,24 @@ export const authController = {
       res.status(201).json({
         success: true,
         message: 'Inscription réussie',
-        data: { user: userResponse, tokens: { accessToken, refreshToken } },
+        data: {
+          user: userResponse,
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
+        },
       } as ApiResponse);
     } catch (error) {
       console.error('Register error:', error);
-      res.status(500).json({ success: false, message: 'Erreur lors de l\'inscription' } as ApiResponse);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur lors de l\'inscription',
+      } as ApiResponse);
     }
   },
 
+  // Déconnexion
   async logout(req: Request, res: Response) {
     try {
       if (req.user) {
@@ -177,22 +206,32 @@ export const authController = {
         });
       }
 
-      res.json({ success: true, message: 'Déconnexion réussie' } as ApiResponse);
+      res.json({
+        success: true,
+        message: 'Déconnexion réussie',
+      } as ApiResponse);
     } catch (error) {
       console.error('Logout error:', error);
-      res.status(500).json({ success: false, message: 'Erreur lors de la déconnexion' } as ApiResponse);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur lors de la déconnexion',
+      } as ApiResponse);
     }
   },
 
+  // Rafraîchir le token
   async refreshToken(req: Request, res: Response) {
     try {
       const { refreshToken } = req.body;
 
       if (!refreshToken) {
-        return res.status(401).json({ success: false, message: 'Refresh token requis' } as ApiResponse);
+        return res.status(401).json({
+          success: false,
+          message: 'Refresh token requis',
+        } as ApiResponse);
       }
 
-      const decoded = jwt.verify(refreshToken, jwtRefreshSecret) as { id: number };
+      const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret) as { id: number };
 
       const user = await prisma.utilisateur.findUnique({
         where: { id: decoded.id },
@@ -200,31 +239,45 @@ export const authController = {
       });
 
       if (!user) {
-        return res.status(401).json({ success: false, message: 'Utilisateur non trouvé' } as ApiResponse);
+        return res.status(401).json({
+          success: false,
+          message: 'Utilisateur non trouvé',
+        } as ApiResponse);
       }
 
       const accessToken = jwt.sign(
         { id: user.id, email: user.email, role: user.role.libelle },
-        jwtSecret,
+        config.jwt.secret,
         { expiresIn: config.jwt.expiresIn } as SignOptions
       );
 
       res.json({
         success: true,
         message: 'Token rafraîchi avec succès',
-        data: { tokens: { accessToken, refreshToken } },
+        data: {
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
+        },
       } as ApiResponse);
     } catch (error) {
       console.error('Refresh token error:', error);
-      res.status(401).json({ success: false, message: 'Refresh token invalide' } as ApiResponse);
+      res.status(401).json({
+        success: false,
+        message: 'Refresh token invalide',
+      } as ApiResponse);
     }
   },
 
-  async requestPasswordReset(_req: Request, res: Response) {
+  // Demande de réinitialisation de mot de passe
+  async requestPasswordReset(req: Request, res: Response) {
     try {
-      const { email } = _req.body;
+      const { email } = req.body;
 
-      const user = await prisma.utilisateur.findUnique({ where: { email } });
+      const user = await prisma.utilisateur.findUnique({
+        where: { email },
+      });
 
       res.json({
         success: true,
@@ -232,8 +285,7 @@ export const authController = {
       } as ApiResponse);
 
       if (user) {
-        // Générer un token de réinitialisation
-        // Envoyer l\'email
+        // TODO: Implémenter envoi d'email avec token
       }
     } catch (error) {
       console.error('Password reset request error:', error);
@@ -244,16 +296,23 @@ export const authController = {
     }
   },
 
-  async resetPassword(_req: Request, res: Response) {
+  // Réinitialisation de mot de passe
+  async resetPassword(req: Request, res: Response) {
     try {
+      const { token: _token, newPassword: _newPassword } = req.body;
+
+      // TODO: Implémenter la vérification du token et mise à jour mot de passe
+
       res.json({
         success: true,
         message: 'Mot de passe réinitialisé avec succès',
       } as ApiResponse);
     } catch (error) {
       console.error('Password reset error:', error);
-      res.status(500).json({ success: false, message: 'Erreur lors de la réinitialisation du mot de passe' } as ApiResponse);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur lors de la réinitialisation du mot de passe',
+      } as ApiResponse);
     }
   },
 };
-

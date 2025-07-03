@@ -17,6 +17,7 @@ async function main() {
   await prisma.facture.deleteMany();
   await prisma.devisLigne.deleteMany();
   await prisma.devis.deleteMany();
+  await prisma.technicienIntervention.deleteMany();
   await prisma.intervention.deleteMany();
   await prisma.mission.deleteMany();
   await prisma.technicien.deleteMany();
@@ -222,21 +223,36 @@ async function main() {
         dateHeureFin: new Date('2024-01-15T13:30:00Z'),
         duree: 210, // 3h30
         missionId: missions[0].numIntervention,
-        technicienId: techniciens[0].id, // Konan Yane (Réseau)
+        technicienInterventions: {
+          create: {
+            technicienId: techniciens[0].id,
+            role: 'principal'
+          }
+        }
       },
     }),
     prisma.intervention.create({
       data: {
         dateHeureDebut: new Date('2024-01-16T15:00:00Z'),
         missionId: missions[1].numIntervention,
-        technicienId: techniciens[1].id, // Theodore Kabres (développeur web)
+        technicienInterventions: {
+          create: {
+            technicienId: techniciens[1].id,
+            role: 'principal'
+          }
+        }
       },
     }),
     prisma.intervention.create({
       data: {
         dateHeureDebut: new Date('2024-01-18T11:00:00Z'),
         missionId: missions[2].numIntervention,
-        technicienId: techniciens[2].id, // KOUASSI BEIBRO (Hardware)
+        technicienInterventions: {
+          create: {
+            technicienId: techniciens[2].id,
+            role: 'principal'
+          }
+        }
       },
     }),
   ]);
@@ -284,7 +300,7 @@ async function main() {
       data: {
         userId: admin.id,
         type: 'info',
-        message: 'Bienvenue sur ParabellumGroups System',
+        message: 'Bienvenue sur Progitek System',
         createdAt: new Date(),
       },
     }),
@@ -292,7 +308,7 @@ async function main() {
       data: {
         userId: user.id,
         type: 'info',
-        message: 'Bienvenue sur ParabellumGroups System',
+        message: 'Bienvenue sur Progitek System',
         createdAt: new Date(),
       },
     }),

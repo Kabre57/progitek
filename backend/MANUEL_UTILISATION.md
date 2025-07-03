@@ -206,7 +206,7 @@ curl -H "Authorization: Bearer TOKEN" \
 ### Lister les Techniciens
 ```bash
 curl -H "Authorization: Bearer TOKEN" \
-     "http://localhost:3000/api/technicians?page=1&limit=5"
+     "http://localhost:3000/api/Techniciens?page=1&limit=5"
 ```
 
 ### Créer un Technicien
@@ -220,7 +220,7 @@ curl -X POST \
     "contact": "+225 05 06 07 08 09",
     "specialiteId": 1
   }' \
-  http://localhost:3000/api/technicians
+  http://localhost:3000/api/Techniciens
 ```
 
 ## 📋 Gestion des Missions

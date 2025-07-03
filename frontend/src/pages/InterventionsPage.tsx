@@ -16,7 +16,8 @@ import {
   CheckCircle, 
   Clock,
   RefreshCw,
-  Download
+  Download,
+  Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -83,13 +84,10 @@ export const InterventionsPage: React.FC = () => {
     }
   ];
 
-  // Données simulées pour les statistiques
-  const stats = {
-    total: data?.pagination?.total || 0,
-    enCours: 2,
-    terminees: 1,
-    dureeMoyenne: '3h 30min'
-  };
+  // Calculer les statistiques à partir des données réelles
+  const totalInterventions = data?.pagination?.total || 0;
+  const interventionsEnCours = data?.data?.filter(i => !i.dateHeureFin).length || 0;
+  const interventionsTerminees = data?.data?.filter(i => i.dateHeureFin).length || 0;
 
   const getStatusColor = (statut: string) => {
     switch (statut) {
@@ -111,11 +109,11 @@ export const InterventionsPage: React.FC = () => {
     return `${hours}h ${mins}min`;
   };
 
-  const getTechnicianInitials = (nom: string, prenom: string) => {
+  const gettechnicienInitials = (nom: string, prenom: string) => {
     return `${nom.charAt(0)}${prenom.charAt(0)}`.toUpperCase();
   };
 
-  const getTechnicianColor = (specialite: string) => {
+  const gettechnicienColor = (specialite: string) => {
     const colors = {
       'Hardware': 'bg-green-100 text-green-800',
       'développeur web': 'bg-red-100 text-red-800',
@@ -151,7 +149,7 @@ export const InterventionsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestion des interventions</h1>
           <p className="text-gray-600">Suivez et gérez toutes vos interventions techniques en temps réel</p>
@@ -178,25 +176,25 @@ export const InterventionsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total interventions"
-            value={stats.total}
+            value={totalInterventions}
             icon={Settings}
             color="blue"
           />
           <StatCard
             title="En cours"
-            value={stats.enCours}
+            value={interventionsEnCours}
             icon={Play}
             color="blue"
           />
           <StatCard
             title="Terminées"
-            value={stats.terminees}
+            value={interventionsTerminees}
             icon={CheckCircle}
             color="green"
           />
           <StatCard
             title="Durée moyenne"
-            value={stats.dureeMoyenne}
+            value="3h 30min"
             icon={Clock}
             color="purple"
           />
@@ -217,7 +215,7 @@ export const InterventionsPage: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <button 
             onClick={() => setShowFilterPanel(true)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -242,147 +240,150 @@ export const InterventionsPage: React.FC = () => {
 
       {/* Table des interventions */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-        <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left">
-                <input type="checkbox" className="rounded border-gray-300" />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Mission
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Technicien
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Début
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Fin
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Durée
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!interventionsWithStatus.length ? (
+        <div className="table-responsive">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
-                  Aucune intervention trouvée
-                </td>
+                <th className="px-6 py-3 text-left">
+                  <input type="checkbox" className="rounded border-gray-300" />
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Mission
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Techniciens
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Début
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fin
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Durée
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              interventionsWithStatus.map((intervention) => (
-                <tr key={intervention.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    #{intervention.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        #{intervention.missionId} - {intervention.mission?.natureIntervention || 'Mission'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {intervention.mission?.client?.nom || `Client #${intervention.mission?.clientId || ''}`}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {intervention.technicien ? (
-                      <div className="flex items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium mr-3 ${getTechnicianColor(intervention.technicien.specialite?.libelle || '')}`}>
-                          {getTechnicianInitials(intervention.technicien.nom, intervention.technicien.prenom)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {intervention.technicien.nom} {intervention.technicien.prenom}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {intervention.technicien.specialite?.libelle || 'Non spécifié'}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-gray-500">Non assigné</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {intervention.dateHeureDebut 
-                      ? new Date(intervention.dateHeureDebut).toLocaleDateString('fr-FR') + ' ' + 
-                        new Date(intervention.dateHeureDebut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                      : '-'
-                    }
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {intervention.dateHeureFin 
-                      ? new Date(intervention.dateHeureFin).toLocaleDateString('fr-FR') + ' ' + 
-                        new Date(intervention.dateHeureFin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                      : '-'
-                    }
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {intervention.duree ? (
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                        <span className="text-sm text-gray-900">{formatDuration(intervention.duree)}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                        <span className="text-sm text-gray-500">-</span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(intervention.statut)}`}>
-                      {intervention.statut === 'En cours' && <Play className="h-3 w-3 mr-1" />}
-                      {intervention.statut === 'Terminée' && <CheckCircle className="h-3 w-3 mr-1" />}
-                      {intervention.statut}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button 
-                        onClick={() => handleEdit(intervention)}
-                        className="text-blue-600 hover:text-blue-900" 
-                        title="Modifier"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(intervention.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!interventionsWithStatus.length ? (
+                <tr>
+                  <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
+                    Aucune intervention trouvée
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                interventionsWithStatus.map((intervention) => (
+                  <tr key={intervention.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="">
+                      <input type="checkbox" className="rounded border-gray-300" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" data-label="ID">
+                      #{intervention.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Mission">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          #{intervention.missionId} - {intervention.mission?.natureIntervention || 'Mission'}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {intervention.mission?.client?.nom || `Client #${intervention.mission?.clientId || ''}`}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Techniciens">
+                      {intervention.techniciens && intervention.techniciens.length > 0 ? (
+                        <div className="flex -space-x-2 overflow-hidden">
+                          {intervention.techniciens.slice(0, 3).map((tech, index) => (
+                            <div 
+                              key={tech.id} 
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 border-white ${gettechnicienColor(tech.specialite?.libelle || '')}`}
+                              title={`${tech.nom} ${tech.prenom} (${tech.role || 'Assistant'})`}
+                            >
+                              {gettechnicienInitials(tech.nom, tech.prenom)}
+                            </div>
+                          ))}
+                          {intervention.techniciens.length > 3 && (
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium bg-gray-200 text-gray-800 border-2 border-white">
+                              +{intervention.techniciens.length - 3}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-500">Non assigné</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-label="Début">
+                      {intervention.dateHeureDebut 
+                        ? new Date(intervention.dateHeureDebut).toLocaleDateString('fr-FR') + ' ' + 
+                          new Date(intervention.dateHeureDebut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                        : '-'
+                      }
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-label="Fin">
+                      {intervention.dateHeureFin 
+                        ? new Date(intervention.dateHeureFin).toLocaleDateString('fr-FR') + ' ' + 
+                          new Date(intervention.dateHeureFin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                        : '-'
+                      }
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Durée">
+                      {intervention.duree ? (
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-1 text-gray-400" />
+                          <span className="text-sm text-gray-900">{formatDuration(intervention.duree)}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-1 text-gray-400" />
+                          <span className="text-sm text-gray-500">-</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Statut">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(intervention.statut)}`}>
+                        {intervention.statut === 'En cours' && <Play className="h-3 w-3 mr-1" />}
+                        {intervention.statut === 'Terminée' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {intervention.statut}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Actions">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleEdit(intervention)}
+                          className="text-blue-600 hover:text-blue-900" 
+                          title="Modifier"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(intervention.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="text-sm text-gray-700">
             Affichage de {((data.pagination.page - 1) * data.pagination.limit) + 1} à{' '}
             {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} sur{' '}

@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -13,7 +12,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0',
+<<<<<<< HEAD
     // Configuration proxy pour éviter les problèmes CORS en développement
+=======
+>>>>>>> 12e798f (Ajout du workflow de déploiement automatique)
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

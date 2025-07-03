@@ -1,6 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,180 +9,277 @@ datasource db {
 }
 
 model Role {
-  id          Int      @id @default(autoincrement())
-  libelle     String   @unique
+  id          Int          @id @default(autoincrement())
+  libelle     String       @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   utilisateurs Utilisateur[]
 
   @@map("roles")
 }
 
 model Utilisateur {
-  id           Int      @id @default(autoincrement())
-  nom          String
-  prenom       String
-  email        String   @unique
-  motDePasse   String
-  phone        String?
-  theme        String?
-  displayName  String?
-  address      String?
-  state        String?
-  country      String?
-  designation  String?
-  balance      Float?   @default(0)
-  emailStatus  String?  @default("verified")
-  kycStatus    String?  @default("pending")
-  lastLogin    DateTime?
-  status       String   @default("active")
-  roleId       Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          Int           @id @default(autoincrement())
+  nom         String
+  prenom      String
+  email       String        @unique
+  motDePasse  String
+  phone       String?
+  theme       String?
+  displayName String?
+  address     String?
+  state       String?
+  country     String?
+  designation String?
+  balance     Float?        @default(0)
+  emailStatus String?       @default("verified")
+  kycStatus   String?       @default("pending")
+  lastLogin   DateTime?
+  status      String        @default("active")
+  roleId      Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   // Relations
-  role                      Role                       @relation(fields: [roleId], references: [id])
-  auditLogs                 AuditLogs[]
-  notifications             Notification[]
-  notificationPreferences   NotificationPreferences?
-  reports                   Report[]
-  devisValides              Devis[]                    @relation("DevisValidateur")
+  role                    Role                     @relation(fields: [roleId], references: [id])
+  auditLogs               AuditLogs[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreferences?
+  reports                 Report[]
+  devisValides            Devis[]                  @relation("DevisValidateur")
+  documents               Document[]               @relation("DocumentCreator")
+  technicienInterventions TechnicienIntervention[]
+  messagesSent            Message[]                @relation("MessageSender")
+  messagesReceived        Message[]                @relation("MessageReceiver")
+  rapportsMission         RapportMission[]         @relation("RapportCreator")
+  technicien              Technicien?              @relation("TechnicienUtilisateur")
 
   @@map("utilisateurs")
 }
 
 model Client {
-  id                  Int      @id @default(autoincrement())
-  nom                 String
-  email               String   @unique
-  telephone           String?
-  entreprise          String?
-  typeDeCart          String?
-  numeroDeCarte       String?
-  statut              String   @default("active")
-  image               String?
-  localisation        String?
-  theme               String?
-  dateDInscription    DateTime @default(now())
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id               Int        @id @default(autoincrement())
+  nom              String
+  email            String     @unique
+  telephone        String?
+  entreprise       String?
+  typeDeCart       String?
+  numeroDeCarte    String?
+  statut           String     @default("active")
+  image            String?
+  localisation     String?
+  theme            String?
+  dateDInscription DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   // Relations
-  missions            Mission[]
-  devis               Devis[]
-  factures            Facture[]
+  missions Mission[]
+  devis    Devis[]
+  factures Facture[]
 
   @@map("clients")
 }
 
 model Specialite {
-  id          Int      @id @default(autoincrement())
-  libelle     String   @unique
+  id          Int         @id @default(autoincrement())
+  libelle     String      @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   techniciens Technicien[]
 
   @@map("specialites")
 }
 
 model Technicien {
-  id           Int      @id @default(autoincrement())
-  nom          String
-  prenom       String
-  contact      String?
-  specialiteId Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int                     @id @default(autoincrement())
+  nom           String
+  prenom        String
+  contact       String?
+  specialiteId  Int?
+  utilisateurId Int?                    @unique
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
 
   // Relations
-  specialite     Specialite?    @relation(fields: [specialiteId], references: [id])
-  interventions  Intervention[]
+  specialite              Specialite?              @relation(fields: [specialiteId], references: [id])
+  technicienInterventions TechnicienIntervention[]
+  utilisateur             Utilisateur?             @relation("TechnicienUtilisateur", fields: [utilisateurId], references: [id])
+  rapportsMission         RapportMission[]
 
   @@map("techniciens")
 }
 
 model Mission {
-  numIntervention                Int      @id @default(autoincrement())
-  natureIntervention             String
-  objectifDuContrat              String?
-  description                    String?
-  dateSortieFicheIntervention    DateTime?
-  clientId                       Int
-  createdAt                      DateTime @default(now())
-  updatedAt                      DateTime @updatedAt
+  numIntervention             Int                @id @default(autoincrement())
+  natureIntervention          String
+  objectifDuContrat           String?
+  description                 String?
+  dateSortieFicheIntervention DateTime?
+  clientId                    Int
+  createdAt                   DateTime           @default(now())
+  updatedAt                   DateTime           @updatedAt
 
   // Relations
-  client         Client         @relation(fields: [clientId], references: [id])
-  interventions  Intervention[]
-  devis          Devis[]
+  client        Client           @relation(fields: [clientId], references: [id])
+  interventions Intervention[]
+  devis         Devis[]
+  documents     Document[]
+  rapports      RapportMission[]
 
   @@map("missions")
 }
 
 model Intervention {
-  id              Int      @id @default(autoincrement())
-  dateHeureDebut  DateTime?
-  dateHeureFin    DateTime?
-  duree           Int?
-  missionId       Int
-  technicienId    Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             Int                      @id @default(autoincrement())
+  dateHeureDebut DateTime?
+  dateHeureFin   DateTime?
+  duree          Int?
+  missionId      Int
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 
   // Relations
-  mission     Mission     @relation(fields: [missionId], references: [numIntervention])
-  technicien  Technicien? @relation(fields: [technicienId], references: [id])
+  mission                 Mission                  @relation(fields: [missionId], references: [numIntervention])
+  technicienInterventions TechnicienIntervention[]
+  rapports                RapportMission[]
 
   @@map("interventions")
 }
 
-model Devis {
-  id                  Int      @id @default(autoincrement())
-  numero              String   @unique
-  clientId            Int
-  missionId           Int?
-  titre               String
-  description         String?
-  montantHT           Float
-  tauxTVA             Float    @default(18)
-  montantTTC          Float
-  statut              String   @default("brouillon") // brouillon, envoye, valide_dg, refuse_dg, accepte_client, refuse_client, facture
-  dateCreation        DateTime
-  dateValidite        DateTime
-  dateValidationDG    DateTime?
-  dateReponseClient   DateTime?
-  commentaireDG       String?
-  commentaireClient   String?
-  validePar           Int?
-  factureId           Int?     @unique
-
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+model TechnicienIntervention {
+  id             Int           @id @default(autoincrement())
+  technicienId   Int
+  interventionId Int
+  role           String?
+  commentaire    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  utilisateurId  Int?
 
   // Relations
-  client      Client       @relation(fields: [clientId], references: [id])
-  mission     Mission?     @relation(fields: [missionId], references: [numIntervention])
-  validateur  Utilisateur? @relation("DevisValidateur", fields: [validePar], references: [id])
-  facture     Facture?     @relation(fields: [factureId], references: [id])
-  lignes      DevisLigne[]
+  technicien   Technicien    @relation(fields: [technicienId], references: [id])
+  intervention Intervention  @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+  utilisateur  Utilisateur?  @relation(fields: [utilisateurId], references: [id])
+
+  @@unique([technicienId, interventionId])
+  @@map("technicien_interventions")
+}
+
+model Document {
+  id          Int         @id @default(autoincrement())
+  title       String
+  type        String
+  url         String
+  missionId   Int
+  createdById Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  mission   Mission     @relation(fields: [missionId], references: [numIntervention])
+  createdBy Utilisateur @relation("DocumentCreator", fields: [createdById], references: [id])
+
+  @@map("documents")
+}
+
+model RapportMission {
+  id             Int            @id @default(autoincrement())
+  titre          String
+  contenu        String
+  interventionId Int
+  technicienId   Int
+  missionId      Int
+  createdById    Int
+  statut         String         @default("soumis")
+  dateValidation DateTime?
+  commentaire    String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  intervention Intervention   @relation(fields: [interventionId], references: [id])
+  technicien   Technicien     @relation(fields: [technicienId], references: [id])
+  mission      Mission        @relation(fields: [missionId], references: [numIntervention])
+  createdBy    Utilisateur    @relation("RapportCreator", fields: [createdById], references: [id])
+  images       RapportImage[]
+
+  @@map("rapports_mission")
+}
+
+model RapportImage {
+  id          Int           @id @default(autoincrement())
+  rapportId   Int
+  url         String
+  description String?
+  ordre       Int           @default(0)
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  rapport RapportMission @relation(fields: [rapportId], references: [id], onDelete: Cascade)
+
+  @@map("rapport_images")
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  contenu     String
+  senderId    Int
+  receiverId  Int
+  lu          Boolean   @default(false)
+  dateLecture DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  sender   Utilisateur @relation("MessageSender", fields: [senderId], references: [id])
+  receiver Utilisateur @relation("MessageReceiver", fields: [receiverId], references: [id])
+
+  @@map("messages")
+}
+
+model Devis {
+  id                Int       @id @default(autoincrement())
+  numero            String    @unique
+  clientId          Int
+  missionId         Int?
+  titre             String
+  description       String?
+  montantHT         Float
+  tauxTVA           Float     @default(18)
+  montantTTC        Float
+  statut            String    @default("brouillon")
+  dateCreation      DateTime
+  dateValidite      DateTime
+  dateValidationDG  DateTime?
+  dateReponseClient DateTime?
+  commentaireDG     String?
+  commentaireClient String?
+  validePar         Int?
+  factureId         Int?      @unique
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  client     Client       @relation(fields: [clientId], references: [id])
+  mission    Mission?     @relation(fields: [missionId], references: [numIntervention])
+  validateur Utilisateur? @relation("DevisValidateur", fields: [validePar], references: [id])
+  facture    Facture?
+  lignes     DevisLigne[]
 
   @@map("devis")
 }
 
 model DevisLigne {
-  id            Int    @id @default(autoincrement())
-  devisId       Int
-  designation   String
-  quantite      Float
-  prixUnitaire  Float
-  montantHT     Float
-  ordre         Int
+  id           Int    @id @default(autoincrement())
+  devisId      Int
+  designation  String
+  quantite     Float
+  prixUnitaire Float
+  montantHT    Float
+  ordre        Int
 
   // Relations
   devis Devis @relation(fields: [devisId], references: [id], onDelete: Cascade)
@@ -193,38 +288,38 @@ model DevisLigne {
 }
 
 model Facture {
-  id                    Int      @id @default(autoincrement())
-  numero                String   @unique
-  devisId               Int      @unique
-  clientId              Int
-  montantHT             Float
-  tauxTVA               Float
-  montantTTC            Float
-  statut                String   @default("emise") // emise, envoyee, payee, annulee
-  dateEmission          DateTime
-  dateEcheance          DateTime
-  datePaiement          DateTime?
-  modePaiement          String?
-  referenceTransaction  String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   Int       @id @default(autoincrement())
+  numero               String    @unique
+  devisId              Int       @unique
+  clientId             Int
+  montantHT            Float
+  tauxTVA              Float
+  montantTTC           Float
+  statut               String    @default("emise")
+  dateEmission         DateTime
+  dateEcheance         DateTime
+  datePaiement         DateTime?
+  modePaiement         String?
+  referenceTransaction String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   // Relations
-  devis   Devis?
-  client  Client          @relation(fields: [clientId], references: [id])
-  lignes  FactureLigne[]
+  devis  Devis?         @relation(fields: [devisId], references: [id])
+  client Client         @relation(fields: [clientId], references: [id])
+  lignes FactureLigne[]
 
   @@map("factures")
 }
 
 model FactureLigne {
-  id            Int    @id @default(autoincrement())
-  factureId     Int
-  designation   String
-  quantite      Float
-  prixUnitaire  Float
-  montantHT     Float
-  ordre         Int
+  id           Int    @id @default(autoincrement())
+  factureId    Int
+  designation  String
+  quantite     Float
+  prixUnitaire Float
+  montantHT    Float
+  ordre        Int
 
   // Relations
   facture Facture @relation(fields: [factureId], references: [id], onDelete: Cascade)
@@ -233,13 +328,13 @@ model FactureLigne {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
   type      String
   message   String
   data      String?
   readAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   // Relations
   user Utilisateur @relation(fields: [userId], references: [id])
@@ -248,13 +343,13 @@ model Notification {
 }
 
 model NotificationPreferences {
-  id                    Int     @id @default(autoincrement())
-  userId                Int     @unique
-  checkUnusualActivity  Boolean @default(true)
-  checkNewSignIn        Boolean @default(true)
-  notifyLatestNews      Boolean @default(true)
-  notifyFeatureUpdate   Boolean @default(true)
-  notifyAccountTips     Boolean @default(false)
+  id                   Int     @id @default(autoincrement())
+  userId               Int     @unique
+  checkUnusualActivity Boolean @default(true)
+  checkNewSignIn       Boolean @default(true)
+  notifyLatestNews     Boolean @default(true)
+  notifyFeatureUpdate  Boolean @default(true)
+  notifyAccountTips    Boolean @default(false)
 
   // Relations
   user Utilisateur @relation(fields: [userId], references: [id])

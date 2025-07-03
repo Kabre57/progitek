@@ -111,3 +111,16 @@ export interface FactureLigne {
   montantHT: number;
   ordre: number;
 }
+
+export interface Document {
+  id: number;
+  title: string;
+  type: string;
+  url: string;
+  missionId: number;
+  createdById: number;
+  createdAt: string;
+  updatedAt: string;
+  mission?: any;
+  createdBy?: any;
+}

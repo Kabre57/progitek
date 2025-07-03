@@ -12,7 +12,9 @@ import {
   CheckCircle,
   AlertTriangle,
   Settings,
-  RefreshCw
+  RefreshCw,
+  FileText,
+  ArrowRight
 } from 'lucide-react';
 import { Line, Bar } from 'react-chartjs-2';
 import {
@@ -26,6 +28,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useNavigate } from 'react-router-dom';
 
 // Enregistrer les composants Chart.js
 ChartJS.register(
@@ -42,6 +45,62 @@ ChartJS.register(
 export const Dashboard: React.FC = () => {
   const { data, loading, error, refetch } = useApi(() => dashboardService.getDashboardData(), []);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const navigate = useNavigate();
+
+  // Projets en cours et tâches prioritaires (simulés)
+  const currentProjects = [
+    {
+      id: 1,
+      title: "Installation réseau INFAS",
+      client: "INFAS",
+      progress: 75,
+      dueDate: "2024-07-15",
+      priority: "high"
+    },
+    {
+      id: 2,
+      title: "Maintenance serveurs DataSys",
+      client: "DataSys Industries",
+      progress: 30,
+      dueDate: "2024-07-20",
+      priority: "medium"
+    },
+    {
+      id: 3,
+      title: "Audit sécurité InnovateTech",
+      client: "InnovateTech",
+      progress: 10,
+      dueDate: "2024-07-25",
+      priority: "low"
+    }
+  ];
+
+  const priorityTasks = [
+    {
+      id: 1,
+      title: "Intervention urgente serveur principal",
+      client: "INFAS",
+      dueDate: "2024-07-05",
+      assignedTo: "Konan Yane",
+      priority: "critical"
+    },
+    {
+      id: 2,
+      title: "Mise à jour firewall",
+      client: "DataSys Industries",
+      dueDate: "2024-07-08",
+      assignedTo: "Theodore Kabres",
+      priority: "high"
+    },
+    {
+      id: 3,
+      title: "Remplacement disque dur défectueux",
+      client: "InnovateTech",
+      dueDate: "2024-07-10",
+      assignedTo: "KOUASSI BEIBRO",
+      priority: "medium"
+    }
+  ];
 
   // Rafraîchir les données toutes les 5 minutes
   useEffect(() => {
@@ -128,6 +187,30 @@ export const Dashboard: React.FC = () => {
     },
   };
 
+  // Fonction pour obtenir la classe de couleur selon la priorité
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+        return 'bg-red-100 text-red-800';
+      case 'high':
+        return 'bg-orange-100 text-orange-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Fonction pour calculer la classe de couleur de la barre de progression
+  const getProgressColor = (progress: number) => {
+    if (progress < 25) return 'bg-red-500';
+    if (progress < 50) return 'bg-orange-500';
+    if (progress < 75) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -210,6 +293,105 @@ export const Dashboard: React.FC = () => {
                 +6.2% vs mois dernier
               </dd>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Projets en cours et tâches prioritaires */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Projets en cours */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Projets en cours</h3>
+            <button 
+              onClick={() => navigate('/missions')}
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              Voir tout <ArrowRight className="h-4 w-4 ml-1" />
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            {currentProjects.map(project => (
+              <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900">{project.title}</h4>
+                    <p className="text-xs text-gray-500">Client: {project.client}</p>
+                  </div>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
+                    {project.priority === 'high' && 'Haute'}
+                    {project.priority === 'medium' && 'Moyenne'}
+                    {project.priority === 'low' && 'Basse'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center text-xs text-gray-500 mb-2">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  Échéance: {new Date(project.dueDate).toLocaleDateString('fr-FR')}
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${getProgressColor(project.progress)}`}
+                    style={{ width: `${project.progress}%` }}
+                  ></div>
+                </div>
+                <div className="text-right text-xs text-gray-500 mt-1">
+                  {project.progress}% complété
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tâches prioritaires */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Tâches prioritaires</h3>
+            <button 
+              onClick={() => navigate('/interventions')}
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              Voir tout <ArrowRight className="h-4 w-4 ml-1" />
+            </button>
+          </div>
+          
+          <div className="space-y-3">
+            {priorityTasks.map(task => (
+              <div key={task.id} className="flex items-start p-3 border rounded-lg hover:bg-gray-50">
+                <div className={`flex-shrink-0 w-2 h-full rounded-full ${
+                  task.priority === 'critical' ? 'bg-red-500' :
+                  task.priority === 'high' ? 'bg-orange-500' :
+                  task.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                } mr-3`}></div>
+                
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                      {task.priority === 'critical' && 'Critique'}
+                      {task.priority === 'high' && 'Haute'}
+                      {task.priority === 'medium' && 'Moyenne'}
+                      {task.priority === 'low' && 'Basse'}
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500">Client: {task.client}</p>
+                  
+                  <div className="flex justify-between items-center mt-2 text-xs">
+                    <div className="flex items-center text-gray-500">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {new Date(task.dueDate).toLocaleDateString('fr-FR')}
+                    </div>
+                    <div className="flex items-center text-gray-500">
+                      <Users className="h-3 w-3 mr-1" />
+                      {task.assignedTo}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

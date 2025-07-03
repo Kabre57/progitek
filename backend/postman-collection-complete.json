@@ -623,18 +623,18 @@
       ]
     },
     {
-      "name": "🔧 Technicians",
+      "name": "🔧 Techniciens",
       "description": "Gestion des techniciens",
       "item": [
         {
-          "name": "Get All Technicians",
+          "name": "Get All Techniciens",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/technicians?page=1&limit=10",
+              "raw": "{{baseUrl}}/api/Techniciens?page=1&limit=10",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians"],
+              "path": ["api", "Techniciens"],
               "query": [
                 {
                   "key": "page",
@@ -649,7 +649,7 @@
           }
         },
         {
-          "name": "Create Technician",
+          "name": "Create Technicien",
           "request": {
             "method": "POST",
             "header": [
@@ -663,26 +663,26 @@
               "raw": "{\n  \"nom\": \"Martin\",\n  \"prenom\": \"Pierre\",\n  \"contact\": \"+225 05 06 07 08 09\",\n  \"specialiteId\": 1\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/technicians",
+              "raw": "{{baseUrl}}/api/Techniciens",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians"]
+              "path": ["api", "Techniciens"]
             }
           }
         },
         {
-          "name": "Get Technician by ID",
+          "name": "Get Technicien by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/technicians/1",
+              "raw": "{{baseUrl}}/api/Techniciens/1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians", "1"]
+              "path": ["api", "Techniciens", "1"]
             }
           }
         },
         {
-          "name": "Update Technician",
+          "name": "Update Technicien",
           "request": {
             "method": "PUT",
             "header": [
@@ -696,21 +696,21 @@
               "raw": "{\n  \"contact\": \"+225 06 07 08 09 10\",\n  \"specialiteId\": 2\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/technicians/1",
+              "raw": "{{baseUrl}}/api/Techniciens/1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians", "1"]
+              "path": ["api", "Techniciens", "1"]
             }
           }
         },
         {
-          "name": "Delete Technician",
+          "name": "Delete Technicien",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/technicians/1",
+              "raw": "{{baseUrl}}/api/Techniciens/1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians", "1"]
+              "path": ["api", "Techniciens", "1"]
             }
           }
         },
@@ -720,9 +720,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/technicians/specialites",
+              "raw": "{{baseUrl}}/api/Techniciens/specialites",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "technicians", "specialites"]
+              "path": ["api", "Techniciens", "specialites"]
             }
           }
         }

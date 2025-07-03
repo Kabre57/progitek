@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useApi } from '../hooks/useApi';
-import { technicianService } from '../services/technicianService';
+import { technicienService } from '../services/technicienService';
 import { StatCard } from '../components/StatCard';
-import { TechnicianModal } from '../components/modals/TechnicianModal';
+import { TechnicienModal } from '../components/modals/TechnicienModal';
 import { ExportButton } from '../components/ExportButton';
 import { FilterPanel } from '../components/FilterPanel';
 import { 
@@ -15,27 +15,31 @@ import {
   UserCheck, 
   Award, 
   Wrench,
-  Phone
+  Phone,
+  BarChart2,
+  Link
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
-export const TechniciansPage: React.FC = () => {
+export const TechniciensPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [selectedTechnicien, setSelectedTechnicien] = useState(null);
+  const navigate = useNavigate();
 
   const { data, loading, error, refetch } = useApi(
-    () => technicianService.getTechnicians(page, 10),
+    () => technicienService.getTechniciens(page, 10),
     [page]
   );
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce technicien ?')) {
       try {
-        await technicianService.deleteTechnician(id);
+        await technicienService.deleteTechnicien(id);
         toast.success('Technicien supprimé avec succès');
         refetch();
       } catch (error: any) {
@@ -47,6 +51,10 @@ export const TechniciansPage: React.FC = () => {
   const handleEdit = (technicien: any) => {
     setSelectedTechnicien(technicien);
     setShowEditModal(true);
+  };
+
+  const handleViewDashboard = (id: number) => {
+    navigate(`/technicien-dashboard/${id}`);
   };
 
   const handleModalClose = () => {
@@ -102,7 +110,7 @@ export const TechniciansPage: React.FC = () => {
     return colors[specialite as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const getTechnicianInitials = (nom: string, prenom: string) => {
+  const gettechnicienInitials = (nom: string, prenom: string) => {
     return `${nom.charAt(0)}${prenom.charAt(0)}`.toUpperCase();
   };
 
@@ -125,7 +133,7 @@ export const TechniciansPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestion des techniciens</h1>
           <p className="text-gray-600">Gérez votre équipe de techniciens et leurs spécialités</p>
@@ -168,7 +176,7 @@ export const TechniciansPage: React.FC = () => {
       </div>
 
       {/* Répartition par spécialité */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-6 overflow-x-auto">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Répartition par spécialité</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {specialiteStats.map((specialite) => (
@@ -197,7 +205,7 @@ export const TechniciansPage: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <button 
             onClick={() => setShowFilterPanel(true)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -215,96 +223,116 @@ export const TechniciansPage: React.FC = () => {
 
       {/* Table des techniciens */}
       <div className="bg-white shadow overflow-hidden rounded-lg">
-        <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Technicien
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Spécialité
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contact
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Interventions
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!data?.data || data.data.length === 0 ? (
+        <div className="table-scrollable">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                  Aucun technicien trouvé
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Technicien
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Spécialité
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Contact
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Interventions
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Compte lié
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              data.data.map((technicien) => (
-                <tr key={technicien.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mr-4 ${getSpecialiteColor(technicien.specialite?.libelle || '')}`}>
-                        {getTechnicianInitials(technicien.nom, technicien.prenom)}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {technicien.nom} {technicien.prenom}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Technicien spécialisé
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSpecialiteColor(technicien.specialite?.libelle || '')}`}>
-                      <Wrench className="h-3 w-3 mr-1" />
-                      {technicien.specialite?.libelle || 'Non spécifié'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-900">{technicien.contact || '-'}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {technicien.totalInterventions || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button 
-                        onClick={() => handleEdit(technicien)}
-                        className="text-blue-600 hover:text-blue-900" 
-                        title="Modifier"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(technicien.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!data?.data || data.data.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    Aucun technicien trouvé
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                data.data.map((technicien) => (
+                  <tr key={technicien.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Technicien">
+                      <div className="flex items-center">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mr-4 ${getSpecialiteColor(technicien.specialite?.libelle || '')}`}>
+                          {gettechnicienInitials(technicien.nom, technicien.prenom)}
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {technicien.nom} {technicien.prenom}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Technicien spécialisé
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Spécialité">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSpecialiteColor(technicien.specialite?.libelle || '')}`}>
+                        <Wrench className="h-3 w-3 mr-1" />
+                        {technicien.specialite?.libelle || 'Non spécifié'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Contact">
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="text-sm text-gray-900">{technicien.contact || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-label="Interventions">
+                      {technicien.totalInterventions || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap" data-label="Compte lié">
+                      {technicien.utilisateurId ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <Link className="h-3 w-3 mr-1" />
+                          Compte lié
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-500">Non lié</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" data-label="Actions">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleViewDashboard(technicien.id)}
+                          className="text-purple-600 hover:text-purple-900" 
+                          title="Dashboard"
+                        >
+                          <BarChart2 className="h-4 w-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleEdit(technicien)}
+                          className="text-blue-600 hover:text-blue-900" 
+                          title="Modifier"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(technicien.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {/* Pagination */}
       {data?.pagination && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="text-sm text-gray-700">
             Affichage de {((data.pagination.page - 1) * data.pagination.limit) + 1} à{' '}
             {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} sur{' '}
@@ -330,13 +358,13 @@ export const TechniciansPage: React.FC = () => {
       )}
 
       {/* Modales */}
-      <TechnicianModal
+      <TechnicienModal
         isOpen={showCreateModal}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
       />
 
-      <TechnicianModal
+      <TechnicienModal
         isOpen={showEditModal}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}

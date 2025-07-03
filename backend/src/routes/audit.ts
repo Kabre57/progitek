@@ -81,7 +81,7 @@ router.get('/logs', requireRole(['admin']), async (req: Request, res: Response) 
  *     security:
  *       - bearerAuth: []
  */
-router.get('/stats', requireRole(['admin']), async (_req: Request, res: Response) => {
+router.get('/stats', requireRole(['admin']), async (req: Request, res: Response) => {
   try {
     const stats = await auditService.getAuditStats();
 
@@ -99,4 +99,3 @@ router.get('/stats', requireRole(['admin']), async (_req: Request, res: Response
 });
 
 export { router as auditRouter };
-

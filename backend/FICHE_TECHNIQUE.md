@@ -204,15 +204,15 @@ requireRole(['admin', 'user'])(req, res, next)
 | PUT | `/api/clients/:id` | Modifier client | ✅ |
 | DELETE | `/api/clients/:id` | Supprimer client | ✅ |
 
-### 🔧 Technicians (6 endpoints)
+### 🔧 Techniciens (6 endpoints)
 | Méthode | Endpoint | Description | Auth |
 |---------|----------|-------------|------|
-| GET | `/api/technicians` | Liste techniciens | ✅ |
-| POST | `/api/technicians` | Créer technicien | ✅ |
-| GET | `/api/technicians/:id` | Technicien par ID | ✅ |
-| PUT | `/api/technicians/:id` | Modifier technicien | ✅ |
-| DELETE | `/api/technicians/:id` | Supprimer technicien | ✅ |
-| GET | `/api/technicians/specialites` | Liste spécialités | ✅ |
+| GET | `/api/Techniciens` | Liste techniciens | ✅ |
+| POST | `/api/Techniciens` | Créer technicien | ✅ |
+| GET | `/api/Techniciens/:id` | Technicien par ID | ✅ |
+| PUT | `/api/Techniciens/:id` | Modifier technicien | ✅ |
+| DELETE | `/api/Techniciens/:id` | Supprimer technicien | ✅ |
+| GET | `/api/Techniciens/specialites` | Liste spécialités | ✅ |
 
 ### ⚙️ Specialites (5 endpoints)
 | Méthode | Endpoint | Description | Auth | Rôle |

@@ -1,5 +1,4 @@
-import { Router } from 'express';
-import { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -9,7 +8,7 @@ import {
   createDevisSchema,
   updateDevisSchema,
   validateDevisSchema,
-  responseDevisSchema
+  responseDevisSchema,
 } from '../validations/devis';
 
 const router = Router();
@@ -32,9 +31,7 @@ router.get('/', async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (statut) {
-      where.statut = statut;
-    }
+    if (statut) where.statut = statut;
 
     const [devis, total] = await Promise.all([
       prisma.devis.findMany({
@@ -42,21 +39,11 @@ router.get('/', async (req: Request, res: Response) => {
         skip,
         take: limit,
         include: {
-          client: {
-            select: { nom: true, email: true, entreprise: true },
-          },
-          mission: {
-            select: { numIntervention: true, natureIntervention: true },
-          },
-          validateur: {
-            select: { nom: true, prenom: true },
-          },
-          facture: {
-            select: { id: true, numero: true, statut: true },
-          },
-          lignes: {
-            orderBy: { ordre: 'asc' },
-          },
+          client: { select: { nom: true, email: true, entreprise: true } },
+          mission: { select: { numIntervention: true, natureIntervention: true } },
+          validateur: { select: { nom: true, prenom: true } },
+          facture: { select: { id: true, numero: true, statut: true } },
+          lignes: { orderBy: { ordre: 'asc' } },
         },
         orderBy: { createdAt: 'desc' },
       }),
@@ -75,9 +62,10 @@ router.get('/', async (req: Request, res: Response) => {
       },
     } as PaginatedResponse);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération des devis',
+    console.error(error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur lors de la récupération des devis' 
     } as ApiResponse);
   }
 });
@@ -95,29 +83,17 @@ router.post('/', validateRequest(createDevisSchema), async (req: Request, res: R
   try {
     const { lignes, ...devisData } = req.body;
 
-    // Calculer les montants
     let montantHT = 0;
-    const lignesToCreate = lignes.map((ligne: any, index: number) => {
+    const processedLignes = lignes.map((ligne: any, index: number) => {
       const montantLigne = ligne.quantite * ligne.prixUnitaire;
       montantHT += montantLigne;
-      return {
-        ...ligne,
-        montantHT: montantLigne,
-        ordre: index + 1,
-      };
+      return { ...ligne, montantHT: montantLigne, ordre: index + 1 };
     });
 
     const montantTTC = montantHT * (1 + devisData.tauxTVA / 100);
-
-    // Générer le numéro de devis
     const year = new Date().getFullYear();
     const count = await prisma.devis.count({
-      where: {
-        createdAt: {
-          gte: new Date(`${year}-01-01`),
-          lt: new Date(`${year + 1}-01-01`),
-        },
-      },
+      where: { createdAt: { gte: new Date(`${year}-01-01`), lt: new Date(`${year + 1}-01-01`) } },
     });
     const numero = `DEV-${year}-${String(count + 1).padStart(4, '0')}`;
 
@@ -129,15 +105,9 @@ router.post('/', validateRequest(createDevisSchema), async (req: Request, res: R
         montantTTC,
         statut: 'brouillon',
         dateCreation: new Date(),
-        lignes: {
-          create: lignesToCreate,
-        },
+        lignes: { create: processedLignes },
       },
-      include: {
-        client: true,
-        mission: true,
-        lignes: true,
-      },
+      include: { client: true, mission: true, lignes: true },
     });
 
     await auditService.logAction({
@@ -155,9 +125,10 @@ router.post('/', validateRequest(createDevisSchema), async (req: Request, res: R
       data: devis,
     } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la création du devis',
+    console.error(error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur lors de la création du devis' 
     } as ApiResponse);
   }
 });
@@ -180,13 +151,9 @@ router.get('/:id', async (req: Request, res: Response) => {
       include: {
         client: true,
         mission: true,
-        validateur: {
-          select: { nom: true, prenom: true },
-        },
+        validateur: { select: { nom: true, prenom: true } },
         facture: true,
-        lignes: {
-          orderBy: { ordre: 'asc' },
-        },
+        lignes: { orderBy: { ordre: 'asc' } },
       },
     });
 
@@ -203,6 +170,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       data: devis,
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération du devis',
@@ -224,7 +192,6 @@ router.put('/:id', validateRequest(updateDevisSchema), async (req: Request, res:
     const devisId = parseInt(req.params.id);
     const { lignes, ...devisData } = req.body;
 
-    // Vérifier que le devis peut être modifié
     const existingDevis = await prisma.devis.findUnique({
       where: { id: devisId },
     });
@@ -245,48 +212,27 @@ router.put('/:id', validateRequest(updateDevisSchema), async (req: Request, res:
 
     let updateData: any = { ...devisData };
 
-    // Si des lignes sont fournies, recalculer les montants
     if (lignes) {
       let montantHT = 0;
-      const lignesMapped = lignes.map((ligne: any, index: number) => {
+      const processedLignes = lignes.map((ligne: any, index: number) => {
         const montantLigne = ligne.quantite * ligne.prixUnitaire;
         montantHT += montantLigne;
-        return {
-          ...ligne,
-          montantHT: montantLigne,
-          ordre: index + 1,
-        };
+        return { ...ligne, montantHT: montantLigne, ordre: index + 1 };
       });
 
       const tauxTVA = devisData.tauxTVA || existingDevis.tauxTVA;
       const montantTTC = montantHT * (1 + tauxTVA / 100);
 
-      updateData = {
-        ...updateData,
-        montantHT,
-        montantTTC,
-      };
+      updateData = { ...updateData, montantHT, montantTTC };
 
-      // Supprimer les anciennes lignes et créer les nouvelles
-      await prisma.devisLigne.deleteMany({
-        where: { devisId },
-      });
-
-      updateData.lignes = {
-        create: lignesMapped,
-      };
+      await prisma.devisLigne.deleteMany({ where: { devisId } });
+      updateData.lignes = { create: processedLignes };
     }
 
     const devis = await prisma.devis.update({
       where: { id: devisId },
-      data: {
-        ...updateData,
-      },
-      include: {
-        client: true,
-        mission: true,
-        lignes: true,
-      },
+      data: updateData,
+      include: { client: true, mission: true, lignes: true },
     });
 
     await auditService.logAction({
@@ -304,6 +250,7 @@ router.put('/:id', validateRequest(updateDevisSchema), async (req: Request, res:
       data: devis,
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la modification du devis',
@@ -345,11 +292,7 @@ router.post('/:id/send', async (req: Request, res: Response) => {
     const updatedDevis = await prisma.devis.update({
       where: { id: devisId },
       data: { statut: 'envoye' },
-      include: {
-        client: true,
-        mission: true,
-        lignes: true,
-      },
+      include: { client: true, mission: true, lignes: true },
     });
 
     await auditService.logAction({
@@ -367,6 +310,7 @@ router.post('/:id/send', async (req: Request, res: Response) => {
       data: updatedDevis,
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de l\'envoi du devis',
@@ -417,9 +361,7 @@ router.post('/:id/validate', requireRole(['admin']), validateRequest(validateDev
       include: {
         client: true,
         mission: true,
-        validateur: {
-          select: { nom: true, prenom: true },
-        },
+        validateur: { select: { nom: true, prenom: true } },
         lignes: true,
       },
     });
@@ -439,6 +381,7 @@ router.post('/:id/validate', requireRole(['admin']), validateRequest(validateDev
       data: updatedDevis,
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la validation du devis',
@@ -488,9 +431,7 @@ router.post('/:id/response', validateRequest(responseDevisSchema), async (req: R
       include: {
         client: true,
         mission: true,
-        validateur: {
-          select: { nom: true, prenom: true },
-        },
+        validateur: { select: { nom: true, prenom: true } },
         lignes: true,
       },
     });
@@ -510,6 +451,7 @@ router.post('/:id/response', validateRequest(responseDevisSchema), async (req: R
       data: updatedDevis,
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la réponse au devis',
@@ -566,6 +508,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
       message: 'Devis supprimé avec succès',
     } as ApiResponse);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression du devis',
@@ -574,5 +517,3 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 export { router as devisRouter };
-
-

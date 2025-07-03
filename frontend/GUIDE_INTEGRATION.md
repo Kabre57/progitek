@@ -51,7 +51,7 @@ frontend/src/
 │   ├── api.ts          # Configuration Axios
 │   ├── authService.ts  # Service d'authentification
 │   ├── clientService.ts # Service clients
-│   ├── technicianService.ts # Service techniciens
+│   ├── technicienService.ts # Service techniciens
 │   └── dashboardService.ts # Service dashboard
 ├── hooks/               # Hooks personnalisés
 │   ├── useAuth.ts      # Hook d'authentification

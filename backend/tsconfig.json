@@ -30,7 +30,7 @@
     "skipLibCheck": true,
     "noEmit": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
 <<<<<<< HEAD
     /* Path mapping */

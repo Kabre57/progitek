@@ -1,0 +1,10 @@
+[2025-07-01 16:57:19] ?? Rapport de monitoring Progitek System
+[2025-07-01 16:57:19] CPU: 2%
+[2025-07-01 16:57:19] Mémoire libre: 222MB
+[2025-07-01 16:57:19] Disque: 27% utilisé
+[2025-07-01 16:57:19] Apache2: Actif
+[2025-07-01 16:57:19] PM2: Inactif ou absent
+[2025-07-01 16:57:19] Base SQLite: Présente (124K)
+[2025-07-01 16:57:19] API: OK (200)
+[2025-07-01 16:57:19] Certificat SSL: Non trouvé
+

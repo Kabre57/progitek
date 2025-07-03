@@ -67,6 +67,7 @@ export interface Technicien {
   prenom: string;
   contact?: string;
   specialiteId?: number;
+  utilisateurId?: number;
   specialite?: {
     id: number;
     libelle: string;
@@ -104,6 +105,7 @@ export interface Mission {
   clientId: number;
   client?: Client;
   interventions?: Intervention[];
+  documents?: Document[];
   createdAt: string;
   updatedAt: string;
 }
@@ -114,9 +116,36 @@ export interface Intervention {
   dateHeureFin?: string;
   duree?: number;
   missionId: number;
-  technicienId?: number;
   mission?: Mission;
-  technicien?: Technicien;
+  techniciens?: (Technicien & { role?: string; commentaire?: string })[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TechnicienIntervention {
+  id: number;
+  technicienId: number;
+  interventionId: number;
+  role?: string;
+  commentaire?: string;
+  technicien: Technicien;
+  intervention: Intervention;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Document {
+  id: number;
+  title: string;
+  type: string;
+  url: string;
+  missionId: number;
+  createdById: number;
+  createdBy?: {
+    id: number;
+    nom: string;
+    prenom: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -166,6 +195,7 @@ export interface Devis {
   facture?: Facture;
   lignes?: DevisLigne[];
 }
+
 export interface DevisLigne {
   id: number;
   devisId: number;
@@ -179,8 +209,8 @@ export interface DevisLigne {
 export interface Facture {
   id: number;
   numero: string;
-  clientId: number;
   devisId: number;
+  clientId: number;
   montantHT: number;
   tauxTVA: number;
   montantTTC: number;
@@ -197,7 +227,6 @@ export interface Facture {
   lignes?: FactureLigne[];
 }
 
-
 export interface FactureLigne {
   id: number;
   factureId: number;
@@ -206,4 +235,56 @@ export interface FactureLigne {
   prixUnitaire: number;
   montantHT: number;
   ordre: number;
+}
+
+export interface TechnicienDashboard {
+  technicien: {
+    id: number;
+    nom: string;
+    prenom: string;
+    specialite?: string;
+  };
+  stats: {
+    totalInterventions: number;
+    interventionsEnCours: number;
+    interventionsTerminees: number;
+    dureeMoyenne: number;
+  };
+  interventionsRecentes: Array<{
+    id: number;
+    dateHeureDebut?: string;
+    dateHeureFin?: string;
+    duree?: number;
+    mission: {
+      numIntervention: number;
+      natureIntervention: string;
+      client?: {
+        nom: string;
+        entreprise?: string;
+      };
+    };
+    role?: string;
+    commentaire?: string;
+    status: string;
+  }>;
+  missionsEnCours: Array<{
+    id: number;
+    title: string;
+    client: string;
+    clientEntreprise?: string;
+    progress: number;
+    role?: string;
+  }>;
+  prochainesInterventions: Array<{
+    id: number;
+    dateHeureDebut?: string;
+    mission: {
+      numIntervention: number;
+      natureIntervention: string;
+      client?: {
+        nom: string;
+        entreprise?: string;
+      };
+    };
+  }>;
 }
