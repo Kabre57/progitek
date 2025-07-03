@@ -8,7 +8,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import path from 'path';
 import fs from 'fs';
 
-import { config } from './config/config';
+import { config } from './config/config'; 
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 
