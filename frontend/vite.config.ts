@@ -9,10 +9,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: 'dist', // <-- tr�s important pour Vercel
+  },
   server: {
     port: 5173,
     host: '0.0.0.0',
-    // Configuration proxy pour éviter les problèmes CORS en développement
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
