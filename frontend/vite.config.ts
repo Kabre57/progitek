@@ -10,14 +10,14 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist', // <-- très important pour Vercel
+    outDir: 'dist',
   },
   server: {
     port: 5173,
     host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.VITE_API_URL || 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {
