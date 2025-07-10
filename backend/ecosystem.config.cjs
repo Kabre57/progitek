@@ -2,13 +2,13 @@ module.exports = {
   apps: [
     {
       name: 'progitek-backend',
-      script: './dist/server.js', // ? C’est le bon fichier compilé
+      script: './dist/server.js', // ? Cï¿½est le bon fichier compilï¿½
       instances: 1,
       autorestart: true,
       watch: false,
       env: {
         NODE_ENV: 'development',
-        PORT: 3000
+        PORT: 3001
       }
     }
   ]

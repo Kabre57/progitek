@@ -47,7 +47,7 @@ const corsOptions = {
     'http://localhost:5174',
     'http://192.168.1.85:5173',        // accès local si nécessaire
     'http://100.127.74.69:5173',        // ← ✅ IP Tailscale de ton frontend à la maison
-    'http://ton-frontend.com',         // ← optionnel si tu as un domaine
+    'https://progitek.vercel.app',         // ← optionnel si tu as un domaine
     'http://frontend.taile0fd44.ts.net' // ← si tu accèdes via nom Tailscale
   ],
   credentials: true, // ✅ très important si tu utilises un token JWT ou des cookies

@@ -22,8 +22,8 @@ RUN npx prisma migrate deploy --schema=./prisma/schema.prisma
 # Construire l'application TypeScript
 RUN npm run build
 
-# Exposer le port sur lequel l'application s'exécute (par défaut 3000 pour Express)
-EXPOSE 3000
+# Exposer le port sur lequel l'application s'exécute (par défaut 3001 pour Express)
+EXPOSE 3001
 
 # Commande pour démarrer l'application
 CMD [ "npm", "start" ]

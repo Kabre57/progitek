@@ -9,7 +9,7 @@ module.exports = {
     '!src/server.ts'
   ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 30000,
+  testTimeout: 30010,
   verbose: true,
   forceExit: true,
   detectOpenHandles: true
