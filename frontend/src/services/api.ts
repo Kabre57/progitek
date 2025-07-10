@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration de l'URL de base
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Instance Axios configurée
 export const apiClient = axios.create({
