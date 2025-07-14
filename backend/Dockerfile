@@ -1,29 +1,31 @@
-# Utiliser une image Node.js officielle comme base
+# Étape 1 : Image de base
 FROM node:18-alpine
 
-# Installer les dépendances OpenSSL nécessaires pour Prisma sur Alpine Linux
+# Étape 2 : Dépendances nécessaires pour Prisma
 RUN apk add --no-cache openssl
 
-# Définir le répertoire de travail dans le conteneur
+# Étape 3 : Dossier de travail
 WORKDIR /app
 
-# Copier les fichiers package.json et package-lock.json
+# Étape 4 : Copie des fichiers essentiels en premier (cache npm)
 COPY package*.json ./
+COPY prisma ./prisma
+COPY tsconfig.json ./
 
-# Copier tout le code source (y compris prisma/)
-COPY . .
-
-# Installer les dépendances (npm install exécutera npx prisma generate via postinstall)
+# Étape 5 : Installation des dépendances (npm install exécutera aussi postinstall avec prisma generate)
 RUN npm install
 
-# Exécuter les migrations Prisma (si non déjà fait par postinstall ou pour s'assurer)
-RUN npx prisma migrate deploy --schema=./prisma/schema.prisma
+# Étape 6 : Copie du reste du code
+COPY . .
 
-# Construire l'application TypeScript
+# Étape 7 : Build TypeScript
 RUN npm run build
 
-# Exposer le port sur lequel l'application s'exécute (par défaut 3001 pour Express)
-EXPOSE 3001
+# Étape 8 : Migration (optionnel, à activer si tu déploies sur PostgreSQL ou Supabase)
+# RUN npx prisma migrate deploy --schema=./prisma/schema.prisma
 
-# Commande pour démarrer l'application
-CMD [ "npm", "start" ]
+# Étape 9 : Port exposé (doit correspondre à app.listen())
+EXPOSE 3000
+
+# Étape 10 : Lancement de l'application
+CMD ["npm", "start"]

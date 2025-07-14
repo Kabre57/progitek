@@ -3,10 +3,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const config = {
-  server: {
-    port: parseInt(process.env.PORT || '3001'),
-    nodeEnv: process.env.NODE_ENV || 'development',
-  },
+server: {
+  port: 3000,
+  nodeEnv: process.env.NODE_ENV || 'production',
+  domain: 'pblserver.taile0fd44.ts.net', // ✅ à ajouter
+},
   database: {
     url: process.env.DATABASE_URL || 'file:./dev.db',
   },
@@ -17,7 +18,7 @@ export const config = {
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN || 'http://192.168.1.95,http://localhost:5173,https://progitek.vercel.app,https://frontend.taile0fd44.ts.net',
     credentials: process.env.CORS_CREDENTIALS === 'true',
   },
   security: {
@@ -30,7 +31,7 @@ export const config = {
     port: parseInt(process.env.SMTP_PORT || '587'),
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    fromEmail: process.env.FROM_EMAIL || 'noreply@progitek.com',
+    fromEmail: process.env.FROM_EMAIL || 'theogeoffroy@gmail.com',
     fromName: process.env.FROM_NAME || 'Progitek System',
   },
   logging: {

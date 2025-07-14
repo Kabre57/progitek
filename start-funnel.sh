@@ -1,18 +1,25 @@
 #!/bin/bash
 
-echo "📦 Lancement de Nginx sur le port 8080..."
-sudo systemctl start nginx
+# Variables
+BACKEND_DIR="/var/www/progitek/backend"
+FRONTEND_DIR="/var/www/progitek/frontend"
 
-if systemctl is-active --quiet nginx; then
-    echo "✅ Nginx est démarré avec succès."
-else
-    echo "❌ Échec du démarrage de Nginx. Vérifiez la configuration."
-    exit 1
-fi
+echo "?? Build backend..."
+cd "$BACKEND_DIR" || exit 1
+npm install
+npm run build
+pm2 start ecosystem.config.js || pm2 restart progitek-backend
 
-echo "🌐 Activation de Tailscale Funnel..."
-tailscale funnel 8080
+echo "?? Build frontend..."
+cd "$FRONTEND_DIR" || exit 1
+npm install
+npm run build
+pm2 restart progitek-frontend || pm2 start "npm run preview" --name progitek-frontend
 
-echo "🔗 Ton app est accessible ici (si Tailscale est actif) :"
-tailscale status | grep 'ts.net'
+echo "?? Activation de Tailscale Funnel sur les ports 3000 (backend) et 5173 (frontend)..."
+sudo tailscale funnel 3000
+sudo tailscale funnel 5173
 
+echo "? D�ploiement termin� !"
+echo "?? Frontend : https://pblserver.taile0fd44.ts.net/"
+echo "?? API Docs : https://pblserver.taile0fd44.ts.net/api-docs"

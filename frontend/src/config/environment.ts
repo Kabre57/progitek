@@ -1,13 +1,13 @@
 // Configuration des environnements
 const environments = {
   development: {
-    API_BASE_URL: 'http://localhost:3001',
+    API_BASE_URL: 'http://localhost:3000',
   },
   production: {
-    API_BASE_URL: 'https://votre-backend-production.com',
+    API_BASE_URL: 'https://pblserver.taile0fd44.ts.net',
   },
   preview: {
-    API_BASE_URL: 'https://votre-backend-staging.com',
+    API_BASE_URL: 'https://pblserver.taile0fd44.ts.net',
   }
 };
 

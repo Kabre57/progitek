@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { config } from '../config/environment';
 
-// Utilisation de la configuration centralisée
-const API_BASE_URL = config.API_BASE_URL;
+const API_BASE_URL = `${config.API_BASE_URL}`; // ✅ Correction ici
 
 console.log(`🔗 API Base URL: ${API_BASE_URL}`);
 
@@ -37,7 +36,7 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     console.error(`❌ API Error: ${error.response?.status} ${error.config?.url}`, error.response?.data);
-    
+
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
