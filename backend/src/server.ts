@@ -12,7 +12,6 @@ import { config } from './config/config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 
-// Routes
 import { authRouter } from './routes/auth';
 import { userRouter } from './routes/users';
 import { clientRouter } from './routes/clients';
@@ -34,13 +33,11 @@ import { rapportRouter } from './routes/rapports';
 const app = express();
 const PORT = config.server.port || 3000;
 
-// ✅ Créer le dossier de logs s'il n'existe pas
 const logsDir = path.dirname(config.logging.file);
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// ✅ Configuration CORS unique
 const corsOptions = {
   origin: [
     'http://localhost:5173',
@@ -68,7 +65,6 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// ✅ Sécurité (CSP pour Swagger + GA)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -112,20 +108,16 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// ✅ Appliquer CORS avant tout
 app.use(cors(corsOptions));
 
-// ✅ Logger
 app.use(morgan('combined', {
   stream: fs.createWriteStream(config.logging.file, { flags: 'a' })
 }));
 app.use(morgan('dev'));
 
-// ✅ Parsing JSON & URL Encoded
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ✅ Limitation des requêtes
 app.use(rateLimit({
   windowMs: config.security.rateLimitWindowMs,
   max: config.security.rateLimitMaxRequests,
@@ -137,7 +129,6 @@ app.use(rateLimit({
   legacyHeaders: false,
 }));
 
-// ✅ Swagger documentation
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -184,8 +175,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'Progitek System API Documentation',
 }));
 
-// ✅ Routes santé & info
-app.get('/health', (req, res) => {
+// ✅ Route GET / pour éviter l'erreur 404
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Bienvenue sur l’API Progitek',
+    docs: '/api-docs',
+    health: '/api/health'
+  });
+});
+
+app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     message: 'Serveur en fonctionnement',
@@ -205,7 +205,6 @@ app.get('/api/info', (req, res) => {
   });
 });
 
-// ✅ Routes API
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/clients', clientRouter);
@@ -224,11 +223,9 @@ app.use('/api/documents', documentRouter);
 app.use('/api/messages', messageRouter);
 app.use('/api/rapports', rapportRouter);
 
-// ✅ Gestion des erreurs
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// ✅ Arrêt propre
 process.on('SIGTERM', () => {
   console.log('🛑 SIGTERM reçu, arrêt gracieux du serveur...');
   process.exit(0);
@@ -238,7 +235,6 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// ✅ Démarrage serveur
 app.listen(PORT, '0.0.0.0', () => {
   console.log('🚀 ================================');
   console.log(`🚀 Progitek System API démarré`);

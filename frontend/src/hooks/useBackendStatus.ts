@@ -1,29 +1,24 @@
 import { useEffect, useState } from 'react';
-import {apiClient} from '../services/api';
+import apiClient from '../services/api'; // baseURL = https://pblserver.taile0fd44.ts.net
 import toast from 'react-hot-toast';
 
 export function useBackendStatus() {
-  const [checked, setChecked] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
-    const check = async () => {
+    const checkHealth = async () => {
       try {
-        const res = await apiClient.get('/health');
-        if (res.status === 200) {
-          console.log('✅ Backend opérationnel');
-        } else {
-          throw new Error('Réponse inattendue');
-        }
-      } catch (e) {
-        toast.error('🚨 Backend inaccessible. Veuillez réessayer plus tard.');
-        console.error('❌ Erreur connexion backend:', e);
-      } finally {
-        setChecked(true);
+        const response = await apiClient.get('/api/health');
+        setIsOnline(response.status === 200);
+      } catch (error) {
+        console.error('❌ Erreur connexion backend: ', error);
+        toast.error('Connexion au backend échouée');
+        setIsOnline(false);
       }
     };
 
-    check();
+    checkHealth();
   }, []);
 
-  return { checked };
+  return isOnline;
 }
