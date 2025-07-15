@@ -29,14 +29,15 @@ import { RapportFormPage } from './pages/RapportFormPage';
 import { MaintenancePage } from './pages/MaintenancePage';
 
 function App() {
-  const { checked } = useBackendStatus();
+  // ✅ On vérifie si le backend est en ligne
+  const isOnline = useBackendStatus();
 
-  // Pendant que le backend est vérifié, on affiche un écran vide ou un loader
-  if (!checked) {
+  // ✅ Pendant la vérification, afficher un indicateur de chargement
+  if (!isOnline) {
     return <div className="flex justify-center items-center h-screen">⏳ Vérification du serveur...</div>;
   }
 
-  // Interface principale
+  // ✅ Si tout est OK, on affiche le routeur
   return (
     <BrowserRouter>
       <div className="App">
@@ -91,6 +92,7 @@ function App() {
           <Route path="/rapports/:id" element={<ProtectedRoute><Layout><RapportDetailPage /></Layout></ProtectedRoute>} />
           <Route path="/rapports/new" element={<ProtectedRoute><Layout><RapportFormPage /></Layout></ProtectedRoute>} />
           <Route path="/rapports/edit/:id" element={<ProtectedRoute><Layout><RapportFormPage /></Layout></ProtectedRoute>} />
+
           <Route path="/unauthorized" element={
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
               <div className="text-center">

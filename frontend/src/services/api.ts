@@ -1,10 +1,15 @@
-import axios from 'axios';
+import axios, {
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import { config } from '../config/environment';
 
-const API_BASE_URL = `${config.API_BASE_URL}`; // ✅ Correction ici
+const API_BASE_URL = config.API_BASE_URL;
 
 console.log(`🔗 API Base URL: ${API_BASE_URL}`);
 
+// ✅ Création de l'instance Axios
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -14,53 +19,60 @@ export const apiClient = axios.create({
   withCredentials: false,
 });
 
+// ✅ Intercepteur pour ajouter le token JWT
 apiClient.interceptors.request.use(
-  (config) => {
+  (requestConfig: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (token && requestConfig.headers) {
+      requestConfig.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`🔄 API Request: ${config.method?.toUpperCase()} ${config.url}`);
-    return config;
+    console.log(`🔄 API Request: ${requestConfig.method?.toUpperCase()} ${requestConfig.url}`);
+    return requestConfig;
   },
-  (error) => {
+  (error: AxiosError) => {
     console.error('❌ Request Error:', error);
     return Promise.reject(error);
   }
 );
 
+// ✅ Intercepteur pour traiter les erreurs de réponse
 apiClient.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     console.log(`✅ API Response: ${response.status} ${response.config.url}`);
     return response;
   },
-  async (error) => {
-    console.error(`❌ API Error: ${error.response?.status} ${error.config?.url}`, error.response?.data);
+  async (error: AxiosError) => {
+    const originalRequest: any = error.config;
 
-    const originalRequest = error.config;
+    console.error(`❌ API Error: ${error.response?.status} ${originalRequest?.url}`, error.response?.data);
+
+    // ✅ Gestion du rafraîchissement automatique du token JWT
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) throw new Error('No refresh token available');
+        if (!refreshToken) throw new Error('Aucun refreshToken disponible');
 
-        console.log('🔄 Attempting token refresh...');
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        console.log('🔄 Tentative de rafraîchissement du token...');
+
+        const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
-        }, { withCredentials: false });
+        });
 
-        const { accessToken } = response.data.data.tokens;
+        const { accessToken } = res.data.data.tokens;
         localStorage.setItem('accessToken', accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        console.error('❌ Token refresh failed:', refreshError);
+        console.error('❌ Échec du rafraîchissement de token:', refreshError);
         localStorage.clear();
+
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
+
         return Promise.reject(refreshError);
       }
     }
