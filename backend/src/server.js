@@ -185,7 +185,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 
 // ✅ Routes santé & info
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     message: 'Serveur en fonctionnement',
@@ -194,6 +194,7 @@ app.get('/health', (req, res) => {
     environment: config.server.nodeEnv,
   });
 });
+
 
 app.get('/api/info', (req, res) => {
   res.json({
