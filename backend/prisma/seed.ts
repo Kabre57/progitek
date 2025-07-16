@@ -28,57 +28,57 @@ async function main() {
 
   // Créer les rôles
   console.log('👑 Création des rôles...');
-  const adminRole = await prisma.role.create({
-    data: {
-      libelle: 'admin',
-      description: 'Administrateur avec tous les droits',
-    },
-  });
-
-  const userRole = await prisma.role.create({
-    data: {
-      libelle: 'user',
-      description: 'Utilisateur standard',
-    },
-  });
-
-  const managerRole = await prisma.role.create({
-    data: {
-      libelle: 'manager',
-      description: 'Gestionnaire avec droits de supervision',
-    },
-  });
+  const roles = await Promise.all([
+    prisma.role.create({ data: { libelle: 'admin', description: 'Administrateur avec tous les droits' } }),
+    prisma.role.create({ data: { libelle: 'user', description: 'Utilisateur standard' } }),
+    prisma.role.create({ data: { libelle: 'manager', description: 'Gestionnaire avec droits de supervision' } }),
+    prisma.role.create({ data: { libelle: 'technicien', description: 'Technicien avec droits d\'intervention' } }),
+  ]);
 
   // Créer les utilisateurs
   console.log('👤 Création des utilisateurs...');
-  const adminPassword = await bcrypt.hash('admin123', config.security.bcryptRounds);
-  const userPassword = await bcrypt.hash('user123', config.security.bcryptRounds);
+  const passwords = {
+    admin: await bcrypt.hash('Kwt010100++@', config.security.bcryptRounds),
+    user: await bcrypt.hash('user123', config.security.bcryptRounds),
+    technicien: await bcrypt.hash('technicien123', config.security.bcryptRounds),
+  };
 
-  const admin = await prisma.utilisateur.create({
-    data: {
-      nom: 'Admin',
-      prenom: 'System',
-      email: 'theogoeffroy5@gmail.com',
-      motDePasse: adminPassword,
-      phone: '+225 01 02 03 04 05',
-      roleId: adminRole.id,
-      status: 'active',
-      emailStatus: 'verified',
-    },
-  });
+  const emails = [
+    { nom: 'Admin', prenom: 'System', email: 'admin@progiteck.com', roleId: roles[0].id },
+    { nom: 'kabre', prenom: 'theodore', email: 'theogeoffroy5@gmail.com', roleId: roles[1].id },
+    { nom: 'kabre', prenom: 'theodore', email: 'technicien@progiteck.com', roleId: roles[3].id }, // Utilisez un email unique
+  ];
 
-  const user = await prisma.utilisateur.create({
-    data: {
-      nom: 'Dupont',
-      prenom: 'Jean',
-      email: 'jean.dupont@example.com',
-      motDePasse: userPassword,
-      phone: '+225 07 08 09 10 11',
-      roleId: userRole.id,
-      status: 'active',
-      emailStatus: 'verified',
-    },
-  });
+  const users = [];
+
+  for (const user of emails) {
+    const existingUser = await prisma.utilisateur.findUnique({
+      where: { email: user.email },
+    });
+
+    if (!existingUser) {
+      const newUser = await prisma.utilisateur.create({
+        data: {
+          nom: user.nom,
+          prenom: user.prenom,
+          email: user.email,
+          motDePasse: passwords[user.roleId === roles[0].id ? 'admin' : user.roleId === roles[1].id ? 'user' : 'technicien'],
+          phone: '+225 07 00 00 00 00', // Ajustez les numéros de téléphone si nécessaire
+          roleId: user.roleId,
+          status: 'active',
+          emailStatus: 'verified',
+        },
+      });
+      users.push(newUser);
+    } else {
+      console.log(`Utilisateur avec l'email ${user.email} existe déjà, saut de la création.`);
+      users.push(existingUser);
+    }
+  }
+
+  const [admin, user, technicien] = users;
+
+  // Continuez avec le reste de votre script...
 
   // Créer les spécialités
   console.log('🔧 Création des spécialités...');
