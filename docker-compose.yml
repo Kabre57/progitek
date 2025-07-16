@@ -1,34 +1,44 @@
+version: '3.8'
+
 services:
   backend:
+    container_name: progitek-backend-1
     build:
       context: ./backend
-      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - "3001:3000" # ?? Port 3001 sur ta machine
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: file:./prisma/dev.db
+      - "3000:3000"
     depends_on:
       - db
+    volumes:
+      - ./backend:/app
 
   frontend:
+    container_name: progitek-frontend-1
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/app
 
   db:
-    image: nouchka/sqlite3:latest
-    volumes:
-      - ./backend/prisma/dev.db:/var/lib/sqlite/dev.db
+    image: postgres:15
+    container_name: progitek-db-1
+    restart: always
     environment:
-      SQLITE_DATABASE: dev.db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: progitek
+    volumes:
+      - progitek_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  progitek_pgdata:
