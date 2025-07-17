@@ -46,10 +46,18 @@ class TechnicienService {
   }
 
   // Récupérer les spécialités
-  async getSpecialites(): Promise<Specialite[]> {
-    const response = await apiClient.get('/techniciens/specialites');
-    return response.data.data;
-  }
+
+async getSpecialites(): Promise<Specialite[]> {
+try {
+const response = await apiClient.get<{ success: boolean; data: Specialite[]
+}>("/techniciens/specialites");
+if (!response.data.success) throw new Error("Erreur API");
+return response.data.data;
+} catch (error) {
+console.error("getSpecialites failed:", error);
+throw error; // Propagé au composant
+}
+}
 }
 
 export const technicienService = new TechnicienService();

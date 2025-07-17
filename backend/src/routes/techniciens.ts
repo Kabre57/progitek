@@ -193,7 +193,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/specialites', async (req: Request, res: Response) => {
+
+router.get('/specialites', async (_req: Request, res: Response) => {
   try {
     const specialites = await prisma.specialite.findMany({
       include: {

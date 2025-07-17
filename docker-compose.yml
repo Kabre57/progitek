@@ -1,44 +1,30 @@
 version: '3.8'
 
 services:
-  backend:
-    container_name: progitek-backend-1
-    build:
-      context: ./backend
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    volumes:
-      - ./backend:/app
-
-  frontend:
-    container_name: progitek-frontend-1
-    build:
-      context: ./frontend
-    env_file:
-      - .env
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-
   db:
     image: postgres:15
-    container_name: progitek-db-1
+    container_name: progitek-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: progitek
-    volumes:
-      - progitek_pgdata:/var/lib/postgresql/data
+      POSTGRES_USER: theo_postgres
+      POSTGRES_PASSWORD: Kwt010100++@
+      POSTGRES_DB: progitek_db
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: progitek-backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://theo_postgres:Kwt010100++@@db:5432/progitek_db
+    command: sh -c "npx prisma migrate deploy && node dist/server.js"
 
 volumes:
-  progitek_pgdata:
+  pgdata:
