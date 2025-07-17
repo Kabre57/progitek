@@ -88,12 +88,6 @@ export const LoginForm: React.FC = () => {
               )}
             </button>
           </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Compte de test : theogoeffroy5@gmail.com / admin123
-            </p>
-          </div>
         </form>
       </div>
     </div>

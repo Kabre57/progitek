@@ -104,17 +104,6 @@ export const LoginPage: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {/* Mot de passe oublié */}
-            <div className="text-right">
-              <button
-                type="button"
-                className="text-sm text-blue-600 hover:text-blue-500"
-              >
-                Mot de passe oublié ?
-              </button>
-            </div>
-
             {/* Bouton de connexion */}
             <button
               type="submit"
@@ -131,16 +120,9 @@ export const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Lien d'inscription */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Vous n'avez pas de compte ?{' '}
-              <button className="text-blue-600 hover:text-blue-500 font-medium">
-                Créer un compte
-              </button>
-            </p>
-          </div>
+          <p className="mt-4 text-center text-xs text-gray-500">
+            Si vous n'avez pas de compte: <span className="font-mono">adressez vous a votre responsable</span>
+          </p>
         </div>
       </div>
     </div>

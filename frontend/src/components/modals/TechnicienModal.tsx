@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, Loader } from 'lucide-react';
 import { technicienService, CreateTechnicienData } from '../../services/technicienService';
 import { userService } from '../../services/userService';
-import { Technicien, User } from '../../types/api';
+import { Technicien, Specialite, User } from '../../types/api';
 import toast from 'react-hot-toast';
 
 interface technicienModalProps {
@@ -14,7 +14,7 @@ interface technicienModalProps {
 
 export const TechnicienModal: React.FC<technicienModalProps> = ({ isOpen, onClose, onSuccess, technicien }) => {
   const [loading, setLoading] = useState(false);
-  const [specialites, setSpecialites] = useState<any[]>([]);
+  const [specialites, setSpecialites] = useState<Specialite[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [formData, setFormData] = useState<CreateTechnicienData>({
     nom: '',
